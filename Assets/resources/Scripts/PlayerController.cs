@@ -6,9 +6,12 @@ public class PlayerController : MonoBehaviour {
 
     int speed {get; set;}
 
+    Rigidbody rb;
+
 	// Use this for initialization
 	void Start () {
         speed = 1;
+        rb = this.gameObject.GetComponent<Rigidbody>();
 	}
 	
 	// Update is called once per frame
@@ -53,9 +56,11 @@ public class PlayerController : MonoBehaviour {
     bool hasJumped = false;
     void UpdatePosition() {
 
+        // FIXME: Moving into a block causes the player to glitch into it
+
         if (Input.GetKey("w"))
         {
-            transform.position += (transform.forward/10)*speed;
+           transform.position += (transform.forward/10)*speed;
         }
 
         if (Input.GetKey("s"))
@@ -75,8 +80,8 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKey("space") && !hasJumped)
         {
-            transform.position += (transform.up / 3) * speed;
             hasJumped = true;
+            rb.AddForce(transform.up*225);
         }
     }
 
