@@ -7,11 +7,13 @@ public class PlayerController : MonoBehaviour {
     int speed {get; set;}
 
     Rigidbody rb;
+    BoxCollider boxColl;
 
 	// Use this for initialization
 	void Start () {
         speed = 1;
         rb = this.gameObject.GetComponent<Rigidbody>();
+        boxColl = this.gameObject.GetComponent<BoxCollider>();
 	}
 	
 	// Update is called once per frame
@@ -56,26 +58,70 @@ public class PlayerController : MonoBehaviour {
     bool hasJumped = false;
     void UpdatePosition() {
 
-        // FIXME: Moving into a block causes the player to glitch into it
+        // FIXME: Jumping in a certain way can cause fast upward movement/double jumping
+
+        Vector3 closestBound;
+
+        Collider[] colliders;
 
         if (Input.GetKey("w"))
         {
-           transform.position += (transform.forward/10)*speed;
+            //transform.position += (transform.forward/8)*speed;
+            closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.forward/8)*speed)); // Gets point on bounding box that is closest to the new position
+            closestBound += ((transform.forward / 1000) * speed); // Add the moving Vector to the closest point on the bounding box
+
+            colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
+
+            if (CanMove(colliders))
+            {
+                transform.position = closestBound;
+            }
+
         }
 
         if (Input.GetKey("s"))
         {
-            transform.position += ((-transform.forward)/15)*speed;
+            //transform.position += ((-transform.forward)/15)*speed;
+
+            closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.forward/18)*speed));
+            closestBound += ((-transform.forward / 1000) * speed);
+
+            colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
+
+            if (CanMove(colliders))
+            {
+                transform.position = closestBound;
+            }
         }
 
         if (Input.GetKey("a"))
         {
-            transform.position += ((-transform.right)/10)*speed;
+            //transform.position += ((-transform.right)/10)*speed;
+
+            closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.right/10)*speed));
+            closestBound += ((-transform.right / 1000) * speed);
+
+            colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
+
+            if (CanMove(colliders))
+            {
+                transform.position = closestBound;
+            }
         }
 
         if (Input.GetKey("d"))
         {
-            transform.position += (transform.right/10)*speed;
+            //transform.position += (transform.right/10)*speed;
+
+            closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.right/10)*speed));
+            closestBound += ((transform.right / 1000) * speed);
+
+            colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
+
+            if (CanMove(colliders))
+            {
+                transform.position = closestBound;
+            }
         }
 
         if (Input.GetKey("space") && !hasJumped)
@@ -83,6 +129,22 @@ public class PlayerController : MonoBehaviour {
             hasJumped = true;
             rb.AddForce(transform.up*225);
         }
+
+    }
+
+    bool CanMove(Collider[] colliders) {
+        
+        bool canMove = true;
+
+        foreach (Collider c in colliders)
+        {
+            if (c.CompareTag("Block"))
+            {
+                canMove = false;
+            }
+        }
+
+        return canMove;
     }
 
     void OnCollisionEnter(Collision coll) {
