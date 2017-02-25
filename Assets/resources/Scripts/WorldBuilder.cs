@@ -15,11 +15,21 @@ public class WorldBuilder : MonoBehaviour {
 		
 	}
 
+    /// <summary>
+    /// Generates a block.
+    /// </summary>
+    /// <param name="location">Block Location.</param>
+    /// <param name="blockType">Block type.</param>
     void GenerateBlock(Vector3 location, string blockType) {
         ((GameObject)Instantiate(Resources.Load("Prefabs/" + blockType))).transform.position = location;
     }
 
-    // Generates an 8 by 8 layer of blocks whereas startingPos is the most negative corner and yHeight is the level
+    /// <summary>
+    /// Generates an 8 by 8 layer of blocks.
+    /// </summary>
+    /// <param name="startingPos">The most negative corner of the layer (in x and z)</param>
+    /// <param name="yHeight">The y height of the layer</param>
+    /// <param name="type">The type of block to make the layer with</param>
     void GenerateLayer(Vector2 startingPos, int yHeight, string type) {
         // For now, ignore that yHeight has to change the blocks
         for (int x=(int)startingPos.x; x<(int)startingPos.x+8; x++) {
@@ -29,6 +39,11 @@ public class WorldBuilder : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Generates a chunk from maxHeight down to -20.
+    /// </summary>
+    /// <param name="startingPos">Starting position.</param>
+    /// <param name="maxHeight">Top height of the chunk</param>
     void GenerateChunk(Vector2 startingPos, int maxHeight) {
         // Generate from top down to prevent buggyness
         GenerateLayer(startingPos, maxHeight, BlockType.GRASS_BLOCK);

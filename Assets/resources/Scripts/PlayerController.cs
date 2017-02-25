@@ -9,24 +9,37 @@ public class PlayerController : MonoBehaviour {
     Rigidbody rb;
     BoxCollider boxColl;
 
+    GameObject cameraObject;
+    Camera cam;
+    Vector3 cameraCenter;
+
+
 	// Use this for initialization
 	void Start () {
         speed = 1;
+
         rb = this.gameObject.GetComponent<Rigidbody>();
+
         boxColl = this.gameObject.GetComponent<BoxCollider>();
+
+        cameraObject = this.transform.FindChild("Camera").gameObject;
+        cam = cameraObject.GetComponent<Camera>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
         UpdateVision();
         UpdatePosition();
+        GetBlockFromLookVector();
 	}
 
+
+    /// <summary>
+    /// Updates the player's vision.
+    /// </summary>
     void UpdateVision() {
 
-        GameObject camera = this.transform.FindChild("Camera").gameObject;
-
-        Vector3 currentCamPos = camera.transform.rotation.eulerAngles;
+        Vector3 currentCamPos = cameraObject.transform.rotation.eulerAngles;
         Vector3 currentPlayerPos = this.transform.rotation.eulerAngles;
         Vector3 newCamPos = currentCamPos;
         Vector3 newPlayerPos = currentPlayerPos;
@@ -40,22 +53,26 @@ public class PlayerController : MonoBehaviour {
             newCamPos.x = currentCamPos.x;
         }
 
-        camera.transform.rotation = Quaternion.Euler(newCamPos);
+        cameraObject.transform.rotation = Quaternion.Euler(newCamPos);
 
         this.transform.rotation = Quaternion.Euler(newPlayerPos);
 
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 
-        if (camera.transform.rotation.eulerAngles.x > 80 && camera.transform.rotation.eulerAngles.x < 100)
+        if (cameraObject.transform.rotation.eulerAngles.x > 80 && cameraObject.transform.rotation.eulerAngles.x < 100)
         {
             Debug.LogWarning("STUCK PREVENTION ACTIVE!!!");
-            camera.transform.rotation = new Quaternion(0, 0, 0, 0);
+            cameraObject.transform.rotation = new Quaternion(0, 0, 0, 0);
         }
 
         // TODO: Add stuck prevention for going very fast upwards
     }
 
     bool hasJumped = false;
+
+    /// <summary>
+    /// Updates the player's position.
+    /// </summary>
     void UpdatePosition() {
 
         // FIXME: Jumping in a certain way can cause fast upward movement/double jumping
@@ -132,6 +149,11 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Determines whether this player instance can move based on the specified colliders.
+    /// </summary>
+    /// <returns><c>true</c> if this instance can move; otherwise, <c>false</c>.</returns>
+    /// <param name="colliders">Colliders.</param>
     bool CanMove(Collider[] colliders) {
         
         bool canMove = true;
@@ -145,6 +167,28 @@ public class PlayerController : MonoBehaviour {
         }
 
         return canMove;
+    }
+
+    /// <summary>
+    /// Gets the block from camera's look vector.
+    /// </summary>
+    /// <returns>The block from look vector. NOTE: This may return null</returns>
+    GameObject GetBlockFromLookVector() {
+        cameraCenter = cam.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, cam.nearClipPlane));
+
+        //Debug.Log(cameraCenter);
+
+        RaycastHit rayHit;
+
+        if (Physics.Raycast(cameraCenter, cameraObject.transform.forward, out rayHit))
+        {
+            if (rayHit.transform.gameObject.CompareTag("Block"))
+            {
+                return rayHit.transform.gameObject;
+            }
+        }
+
+        return null;
     }
 
     void OnCollisionEnter(Collision coll) {
