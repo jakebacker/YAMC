@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour {
     Camera cam;
     Vector3 cameraCenter;
 
+    GameObject currentSelectedObject;
+    GameObject lastSelectedObject;
 
 	// Use this for initialization
 	void Start () {
@@ -30,7 +32,21 @@ public class PlayerController : MonoBehaviour {
 	void Update () {
         UpdateVision();
         UpdatePosition();
-        GetBlockFromLookVector();
+        currentSelectedObject = GetBlockFromLookVector();
+        if (currentSelectedObject != lastSelectedObject)
+        {
+            if (GameObject.FindGameObjectWithTag("Selector") != null)
+            {
+                GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
+            }
+
+            if (currentSelectedObject != null)
+            {
+                ((GameObject)Instantiate(Resources.Load("Prefabs/BoxSelector"))).transform.position = (currentSelectedObject.transform.position + new Vector3(0.0f,0.0f,0.5f));
+            }
+        }
+
+        lastSelectedObject = currentSelectedObject;
 	}
 
 
@@ -184,7 +200,10 @@ public class PlayerController : MonoBehaviour {
         {
             if (rayHit.transform.gameObject.CompareTag("Block"))
             {
-                return rayHit.transform.gameObject;
+                if (Vector3.Distance(this.transform.position, rayHit.transform.position) < 10) // Anything >= 10 is too far to reach
+                {
+                    return rayHit.transform.gameObject;
+                }
             }
         }
 
