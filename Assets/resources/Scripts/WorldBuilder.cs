@@ -7,6 +7,7 @@ public class WorldBuilder : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         GenerateChunk(new Vector2(-4, -4), 0);
+        GenerateChunk(new Vector2(4, 4), 0);
         GenerateBlock(new Vector3(0,1,1), BlockType.GRASS_BLOCK);
 	}
 	

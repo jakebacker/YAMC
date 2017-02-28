@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour {
 
         cameraObject = this.transform.FindChild("Camera").gameObject;
         cam = cameraObject.GetComponent<Camera>();
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
 	}
 	
 	// Update is called once per frame
@@ -33,6 +35,8 @@ public class PlayerController : MonoBehaviour {
         UpdateVision();
         UpdatePosition();
         currentSelectedObject = GetBlockFromLookVector();
+
+        // Find the Selector, Kill it, respawn a new selector at the right position
         if (currentSelectedObject != lastSelectedObject)
         {
             if (GameObject.FindGameObjectWithTag("Selector") != null)
@@ -44,6 +48,12 @@ public class PlayerController : MonoBehaviour {
             {
                 ((GameObject)Instantiate(Resources.Load("Prefabs/BoxSelector"))).transform.position = (currentSelectedObject.transform.position + new Vector3(0.0f,0.0f,0.5f));
             }
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            BreakBlock(currentSelectedObject);
+            GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
         }
 
         lastSelectedObject = currentSelectedObject;
@@ -64,6 +74,7 @@ public class PlayerController : MonoBehaviour {
         newPlayerPos.y += Input.GetAxis("Mouse Y");
 
         // HACK: This is horrible... 80 is also a totally random number
+        // FIXME: This needs to allow looking down
         if ((newCamPos.x > 55 && newCamPos.x < 80)  || newCamPos.x < -180)
         {
             newCamPos.x = currentCamPos.x;
@@ -200,7 +211,7 @@ public class PlayerController : MonoBehaviour {
         {
             if (rayHit.transform.gameObject.CompareTag("Block"))
             {
-                if (Vector3.Distance(this.transform.position, rayHit.transform.position) < 10) // Anything >= 10 is too far to reach
+                if (Vector3.Distance(this.transform.position, rayHit.transform.position) < 5) // Anything >= 10 is too far to reach
                 {
                     return rayHit.transform.gameObject;
                 }
@@ -208,6 +219,15 @@ public class PlayerController : MonoBehaviour {
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Breaks a block.
+    /// </summary>
+    /// <param name="block">The block to break</param>
+    void BreakBlock(GameObject block) {
+        Destroy(block);
+        // Play animation
     }
 
     void OnCollisionEnter(Collision coll) {
