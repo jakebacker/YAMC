@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 
     GameObject currentSelectedObject;
     GameObject lastSelectedObject;
+    Vector3 currentVisionCollison = new Vector3(0,0,0);
 
 	// Use this for initialization
 	void Start () {
@@ -30,10 +32,16 @@ public class PlayerController : MonoBehaviour {
         Cursor.visible = false;
 	}
 	
+    void FixedUpdate() {
+
+    }
+
 	// Update is called once per frame
 	void Update () {
+
         UpdateVision();
         UpdatePosition();
+
         currentSelectedObject = GetBlockFromLookVector();
 
         // Find the Selector, Kill it, respawn a new selector at the right position
@@ -213,12 +221,42 @@ public class PlayerController : MonoBehaviour {
             {
                 if (Vector3.Distance(this.transform.position, rayHit.transform.position) < 5) // Anything >= 10 is too far to reach
                 {
+                    currentVisionCollison = rayHit.point;
                     return rayHit.transform.gameObject;
                 }
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets the block face from look vector.
+    /// </summary>
+    /// <returns>The block face from look vector.</returns>
+    GameObject GetBlockFaceFromLookVector() {
+        GameObject block = GetBlockFromLookVector();
+
+        if (block == null)
+        {
+            return null;
+        }
+
+
+        double bestDistance = Int32.MaxValue;
+        double currentDistance;
+        GameObject selectedChild = null;
+
+        foreach (GameObject child in Util.GetChildren(block)) {
+            currentDistance = Vector3.Distance(child.transform.position, currentVisionCollison);
+            if (currentDistance < bestDistance)
+            {
+                bestDistance = currentDistance;
+                selectedChild = child;
+            }
+        }
+
+        return selectedChild;
     }
 
     /// <summary>
