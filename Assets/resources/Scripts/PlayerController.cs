@@ -31,10 +31,6 @@ public class PlayerController : MonoBehaviour {
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
 	}
-	
-    void FixedUpdate() {
-
-    }
 
 	// Update is called once per frame
 	void Update () {
@@ -61,6 +57,12 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             BreakBlock(currentSelectedObject);
+            GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            PlaceBlock(BlockType.DIRT_BLOCK);
             GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
         }
 
@@ -242,7 +244,6 @@ public class PlayerController : MonoBehaviour {
             return null;
         }
 
-
         double bestDistance = Int32.MaxValue;
         double currentDistance;
         GameObject selectedChild = null;
@@ -266,6 +267,56 @@ public class PlayerController : MonoBehaviour {
     void BreakBlock(GameObject block) {
         Destroy(block);
         // Play animation
+    }
+
+    void PlaceBlock(string blockType) {
+        GameObject initialBlock = GetBlockFaceFromLookVector();
+
+        if (initialBlock == null)
+        {
+            return;
+        }
+
+        BlockFace bf = initialBlock.GetComponent<BlockFace>();
+
+        if (bf == null)
+        {
+            Debug.LogWarning("BlockFace does not have a script!");
+            return;
+        }
+
+        Direction initialDirection = bf.direction;
+        Vector3 initialPosition = initialBlock.transform.parent.position;
+
+        Vector3 newPosition = initialPosition;
+
+        switch (initialDirection)
+        {
+            case Direction.UP:
+                newPosition += transform.up;
+                break;
+            case Direction.DOWN:
+                newPosition -= transform.up;
+                break;
+            case Direction.EAST:
+                newPosition += transform.right;
+                break;
+            case Direction.WEST:
+                newPosition -= transform.right;
+                break;
+            case Direction.NORTH:
+                newPosition += transform.forward;
+                break;
+            case Direction.SOUTH:
+                newPosition -= transform.forward;
+                break;
+        }
+
+        Debug.Log("InitialPos: " + initialPosition);
+        Debug.Log("New Pos: " + newPosition);
+
+        WorldBuilder.GenerateBlock(newPosition, blockType);
+
     }
 
     void OnCollisionEnter(Collision coll) {

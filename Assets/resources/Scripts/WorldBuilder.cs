@@ -21,7 +21,7 @@ public class WorldBuilder : MonoBehaviour {
     /// </summary>
     /// <param name="location">Block Location.</param>
     /// <param name="blockType">Block type.</param>
-    void GenerateBlock(Vector3 location, string blockType) {
+    public static void GenerateBlock(Vector3 location, string blockType) {
         ((GameObject)Instantiate(Resources.Load("Prefabs/" + blockType))).transform.position = location;
     }
 
