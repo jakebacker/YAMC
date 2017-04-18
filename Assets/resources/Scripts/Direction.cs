@@ -5,10 +5,10 @@ using UnityEngine;
 
 public enum Direction
 {
-    UP,
-    DOWN,
-    NORTH,
-    SOUTH,
-    EAST,
-    WEST
+	UP,
+	DOWN,
+	NORTH,
+	SOUTH,
+	EAST,
+	WEST
 }
