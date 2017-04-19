@@ -6,7 +6,7 @@ using System;
 public class PlayerController : MonoBehaviour
 {
 
-	int speed { get; set; }
+	/*int speed { get; set; }
 
 	Rigidbody rb;
 	BoxCollider boxColl;
@@ -350,5 +350,5 @@ public class PlayerController : MonoBehaviour
 				hasJumped = false;
 			}
 		}
-	}
+	}*/
 }
