@@ -14,6 +14,8 @@ public class Block
 {
 	public bool empty = false;
 
+	public byte id = 0;
+
 	public Block ReturnBlock {get{return this;}}
 
 	public Block(bool isEmpty)

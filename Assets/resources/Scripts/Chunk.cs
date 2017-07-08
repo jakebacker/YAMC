@@ -18,17 +18,30 @@ public class Chunk : MonoBehaviour
 
 	public Chunk ThisChunk {get{ return this;}}
 
+	public int seed;
+	public int intensity;
+
 	List<Vector3> chunkVerticies = new List<Vector3>();
 	List<Vector2> chunkUV = new List<Vector2>();
 	List<int> chunkTriangles = new List<int>();
 	int VerticiesIndex;
 
+	public Vector2 textureBlockSize;
+	Texture textureAtlas;
+	Vector2 atlasSize;
+
 	void Awake () {
+		textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
+		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
+
 		chunkMesh = this.GetComponent<MeshFilter>().mesh;
 		GenerateChunk();
 	}
 
 	public void GenerateChunk() {
+
+		float[,] chunkHeights = Noise.Generate(chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
+
 		chunkBlocks = new Block[chunkSize.x + 1, chunkSize.y + 1, chunkSize.z + 1];
 
 		for (int x = 0; x <= chunkSize.x; x++)
@@ -37,7 +50,13 @@ public class Chunk : MonoBehaviour
 			{
 				for (int y = 0; y <= chunkSize.y; y++)
 				{
-					chunkBlocks[x, y, z] = new Block(false);
+					chunkBlocks[x, y, z] = new Block(true);
+
+					if (y <= chunkHeights[x, z])
+					{
+						chunkBlocks[x, y, z] = new Block(false);
+						chunkBlocks[x, y, z].id = (byte)Random.Range(0, 3);
+					}
 				}
 			}
 		}
@@ -71,7 +90,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z + blockSize));
 							chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 						if(CheckSides(new RVector3(x,y,z),BlockFace.Bottom))
@@ -83,7 +102,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
 							chunkVerticies.Add(new Vector3(x,y,z+blockSize));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 
@@ -98,7 +117,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
 							chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 						if(CheckSides(new RVector3(x,y,z),BlockFace.Left))
@@ -110,7 +129,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x,y+blockSize,z));
 							chunkVerticies.Add(new Vector3(x,y,z));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 						if(CheckSides(new RVector3(x,y,z),BlockFace.Far))
@@ -122,7 +141,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
 							chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 						if(CheckSides(new RVector3(x,y,z),BlockFace.Near))
@@ -134,7 +153,7 @@ public class Chunk : MonoBehaviour
 							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
 							chunkVerticies.Add(new Vector3(x+blockSize,y,z));
 
-							UpdateChunkUV();
+							UpdateChunkUV(chunkBlocks[x,y,z].id);
 						}
 
 					}
@@ -211,7 +230,7 @@ public class Chunk : MonoBehaviour
 		return true;
 	} 
 
-	void UpdateChunkUV() {
+	void UpdateChunkUV(byte blockID) {
 		chunkTriangles.Add(VerticiesIndex);
 		chunkTriangles.Add(VerticiesIndex + 1);
 		chunkTriangles.Add(VerticiesIndex + 2);
@@ -220,10 +239,14 @@ public class Chunk : MonoBehaviour
 		chunkTriangles.Add(VerticiesIndex + 3);
 		chunkTriangles.Add(VerticiesIndex);
 
-		chunkUV.Add(new Vector2(0, 0));
-		chunkUV.Add(new Vector2(0, 1));
-		chunkUV.Add(new Vector2(1, 1));
-		chunkUV.Add(new Vector2(1, 0));
+		Vector2 textureInterval = new Vector2(1 / atlasSize.x, 1 / atlasSize.y);
+
+		Vector2 textureID = new Vector2(textureInterval.x * (blockID % atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockID / atlasSize.y));
+
+		chunkUV.Add(new Vector2(textureID.x,textureID.y-textureInterval.y));
+		chunkUV.Add(new Vector2(textureID.x+textureInterval.x,textureID.y-textureInterval.y));
+		chunkUV.Add(new Vector2(textureID.x+textureInterval.x,textureID.y));
+		chunkUV.Add(new Vector2(textureID.x,textureID.y));
 	}
 
 	void FinalizeChunk() {
