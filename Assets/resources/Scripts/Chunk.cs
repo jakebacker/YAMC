@@ -55,7 +55,30 @@ public class Chunk : MonoBehaviour
 					if (y <= chunkHeights[x, z])
 					{
 						chunkBlocks[x, y, z] = new Block(false);
-						chunkBlocks[x, y, z].id = (byte)Random.Range(0, 3);
+						//chunkBlocks[x, y, z].id = (byte)Random.Range(0, 3);
+
+						if (y == Mathf.Floor(chunkHeights[x, z]))
+						{
+							chunkBlocks[x, y, z].id = 0;
+						}
+						else if (y >= chunkHeights[x, z] - 5)
+						{
+							chunkBlocks[x, y, z].id = 1;
+						}
+						else
+						{
+							int tempSeed = (int)Mathf.Floor(seed/2*3);
+							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
+							{
+								chunkBlocks[x, y, z].id = 2;
+							}
+							else
+							{
+								chunkBlocks[x, y, z].id = 1;
+							}
+
+						}
+
 					}
 				}
 			}
