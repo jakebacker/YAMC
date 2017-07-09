@@ -7,6 +7,8 @@ public class Chunk : MonoBehaviour
 {
 	Mesh chunkMesh;
 
+	MeshCollider chunkCollider;
+
 	RVector3 chunkPosition;
 	public RVector3 Position{ get{ return chunkPosition;} set{ chunkPosition = value;}}
 
@@ -277,5 +279,7 @@ public class Chunk : MonoBehaviour
 		chunkMesh.triangles = chunkTriangles.ToArray();
 		chunkMesh.uv = chunkUV.ToArray();
 		chunkMesh.RecalculateNormals();
+
+		chunkCollider = this.gameObject.AddComponent<MeshCollider>();
 	}
 }

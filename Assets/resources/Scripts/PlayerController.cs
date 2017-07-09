@@ -6,7 +6,7 @@ using System;
 public class PlayerController : MonoBehaviour
 {
 
-	/*int speed { get; set; }
+	int speed { get; set; }
 
 	Rigidbody rb;
 	BoxCollider boxColl;
@@ -49,32 +49,6 @@ public class PlayerController : MonoBehaviour
 
 		currentSelectedObject = GetBlockFromLookVector();
 
-		// Find the Selector, Kill it, respawn a new selector at the right position
-		if (currentSelectedObject != lastSelectedObject)
-		{
-			if (GameObject.FindGameObjectWithTag("Selector") != null)
-			{
-				GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
-			}
-
-			if (currentSelectedObject != null)
-			{
-				((GameObject)Instantiate(Resources.Load("Prefabs/BoxSelector"))).transform.position = (currentSelectedObject.transform.position + new Vector3(0.0f, 0.0f, 0.5f));
-			}
-		}
-
-		if (Input.GetMouseButtonDown(0))
-		{
-			BreakBlock(currentSelectedObject);
-			GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
-		}
-
-		if (Input.GetMouseButtonDown(1))
-		{
-			PlaceBlock(BlockType.DIRT_BLOCK);
-			GameObject.Destroy(GameObject.FindGameObjectWithTag("Selector"));
-		}
-
 		lastSelectedObject = currentSelectedObject;
 	}
 
@@ -114,8 +88,6 @@ public class PlayerController : MonoBehaviour
 
 		// TODO: Add stuck prevention for going very fast upwards
 	}
-
-	bool hasJumped = false;
 
 	/// <summary>
 	/// Updates the player's position.
@@ -189,9 +161,8 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 
-		if (Input.GetKey("space") && !hasJumped)
+		if (Input.GetKey("space") && Physics.Raycast(this.transform.position, -transform.up, 1))
 		{
-			hasJumped = true;
 			rb.AddForce(transform.up * 225);
 		}
 
@@ -272,74 +243,7 @@ public class PlayerController : MonoBehaviour
 
 		return selectedChild;
 	}
-
-	/// <summary>
-	/// Breaks a block.
-	/// </summary>
-	/// <param name="block">The block to break</param>
-	void BreakBlock(GameObject block)
-	{
-		Destroy(block);
-		// Play animation
-	}
-
-	void PlaceBlock(string blockType)
-	{
-		GameObject initialBlock = GetBlockFaceFromLookVector();
-
-		if (initialBlock == null)
-		{
-			return;
-		}
-
-		BlockFace bf = initialBlock.GetComponent<BlockFace>();
-
-		if (bf == null)
-		{
-			Debug.LogWarning("BlockFace does not have a script!");
-			return;
-		}
-
-		Direction initialDirection = bf.direction;
-		Vector3 initialPosition = initialBlock.transform.parent.position;
-
-		Vector3 newPosition = initialPosition;
-
-		switch (initialDirection)
-		{
-			case Direction.UP:
-				newPosition += posFind.transform.up;
-				Debug.Log("Change in pos: " + posFind.transform.up);
-				break;
-			case Direction.DOWN:
-				newPosition -= posFind.transform.up;
-				Debug.Log("Change in pos: " + -posFind.transform.up);
-				break;
-			case Direction.EAST:
-				newPosition += posFind.transform.right;
-				Debug.Log("Change in pos: " + posFind.transform.right);
-				break;
-			case Direction.WEST:
-				newPosition -= posFind.transform.right;
-				Debug.Log("Change in pos: " + -posFind.transform.right);
-				break;
-			case Direction.NORTH:
-				newPosition += posFind.transform.forward;
-				Debug.Log("Change in pos: " + posFind.transform.forward);
-				break;
-			case Direction.SOUTH:
-				newPosition -= posFind.transform.forward;
-				Debug.Log("Change in pos: " + -posFind.transform.forward);
-				break;
-		}
-
-		Debug.Log("InitialDir: " + initialDirection);
-		Debug.Log("InitialPos: " + initialPosition);
-		Debug.Log("New Pos: " + newPosition);
-
-		WorldBuilder.GenerateBlock(newPosition, blockType);
-
-	}
+		
 
 	void OnCollisionEnter(Collision coll)
 	{
@@ -350,5 +254,5 @@ public class PlayerController : MonoBehaviour
 				hasJumped = false;
 			}
 		}
-	}*/
+	}
 }
