@@ -11,14 +11,9 @@ public class PlayerController : MonoBehaviour
 	Rigidbody rb;
 	BoxCollider boxColl;
 
-	GameObject posFind;
-
 	GameObject cameraObject;
 	Camera cam;
 	Vector3 cameraCenter;
-
-	GameObject currentSelectedObject;
-	GameObject lastSelectedObject;
 	Vector3 currentVisionCollison = new Vector3(0, 0, 0);
 
 	const float RANGE = 5.0f;
@@ -32,9 +27,7 @@ public class PlayerController : MonoBehaviour
 
 		boxColl = this.gameObject.GetComponent<BoxCollider>();
 
-		posFind = GameObject.Find("WorldPositionFinder");
-
-		cameraObject = this.transform.FindChild("Camera").gameObject;
+		cameraObject = this.transform.Find("Camera").gameObject;
 		cam = cameraObject.GetComponent<Camera>();
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
@@ -46,10 +39,6 @@ public class PlayerController : MonoBehaviour
 
 		UpdateVision();
 		UpdatePosition();
-
-		currentSelectedObject = GetBlockFromLookVector();
-
-		lastSelectedObject = currentSelectedObject;
 	}
 
 
@@ -242,17 +231,5 @@ public class PlayerController : MonoBehaviour
 		}
 
 		return selectedChild;
-	}
-		
-
-	void OnCollisionEnter(Collision coll)
-	{
-		if (coll.gameObject.CompareTag("Block"))
-		{
-			if (hasJumped)
-			{
-				hasJumped = false;
-			}
-		}
 	}
 }
