@@ -41,7 +41,6 @@ public class PlayerController : MonoBehaviour
 		UpdatePosition();
 	}
 
-
 	/// <summary>
 	/// Updates the player's vision.
 	/// </summary>
@@ -88,17 +87,13 @@ public class PlayerController : MonoBehaviour
 
 		Vector3 closestBound;
 
-		Collider[] colliders;
-
 		if (Input.GetKey("w"))
 		{
 			//transform.position += (transform.forward/8)*speed;
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.forward / 8) * speed)); // Gets point on bounding box that is closest to the new position
 			closestBound += ((transform.forward / 1000) * speed); // Add the moving Vector to the closest point on the bounding box
 
-			colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
-
-			if (CanMove(colliders))
+			if (!Physics.Raycast(this.transform.position, this.transform.forward, 1))
 			{
 				transform.position = closestBound;
 			}
@@ -112,9 +107,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.forward / 18) * speed));
 			closestBound += ((-transform.forward / 1000) * speed);
 
-			colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
-
-			if (CanMove(colliders))
+			if (!Physics.Raycast(this.transform.position, -this.transform.forward, 1))
 			{
 				transform.position = closestBound;
 			}
@@ -127,9 +120,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.right / 10) * speed));
 			closestBound += ((-transform.right / 1000) * speed);
 
-			colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
-
-			if (CanMove(colliders))
+			if (!Physics.Raycast(this.transform.position, -this.transform.right, 1))
 			{
 				transform.position = closestBound;
 			}
@@ -142,9 +133,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.right / 10) * speed));
 			closestBound += ((transform.right / 1000) * speed);
 
-			colliders = Physics.OverlapBox(closestBound, new Vector3(0, 0, 0));
-
-			if (CanMove(colliders))
+			if (!Physics.Raycast(this.transform.position, this.transform.right, 1))
 			{
 				transform.position = closestBound;
 			}
@@ -152,30 +141,9 @@ public class PlayerController : MonoBehaviour
 
 		if (Input.GetKey("space") && Physics.Raycast(this.transform.position, -transform.up, 1))
 		{
-			rb.AddForce(transform.up * 225);
+			rb.AddForceAtPosition(transform.up * 270, -transform.up);
 		}
 
-	}
-
-	/// <summary>
-	/// Determines whether this player instance can move based on the specified colliders.
-	/// </summary>
-	/// <returns><c>true</c> if this instance can move; otherwise, <c>false</c>.</returns>
-	/// <param name="colliders">Colliders.</param>
-	bool CanMove(Collider[] colliders)
-	{
-        
-		bool canMove = true;
-
-		foreach (Collider c in colliders)
-		{
-			if (c.CompareTag("Block"))
-			{
-				canMove = false;
-			}
-		}
-
-		return canMove;
 	}
 
 	/// <summary>
