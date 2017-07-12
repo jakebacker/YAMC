@@ -16,6 +16,16 @@ public class Block
 
 	public byte id = 0;
 
+	/*
+	 * Mining Levels:
+	 * 0: Hand
+	 * 1: Wood
+	 * 2: Stone
+	 * 3: Iron
+	 * 4: Diamond
+	 */
+	public byte miningLevel = 0;
+
 	public Block ReturnBlock {get{return this;}}
 
 	public Block(bool isEmpty)

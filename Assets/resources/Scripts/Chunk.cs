@@ -55,22 +55,22 @@ public class Chunk : MonoBehaviour
 					if (y <= chunkHeights[x, z])
 					{
 						chunkBlocks[x, y, z] = new Block(false);
-						//chunkBlocks[x, y, z].id = (byte)Random.Range(0, 3);
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
-							chunkBlocks[x, y, z].id = 0;
+							chunkBlocks[x, y, z].id = 0; // Grass
 						}
 						else if (y >= chunkHeights[x, z] - 5)
 						{
-							chunkBlocks[x, y, z].id = 1;
+							chunkBlocks[x, y, z].id = 1; // Dirt
 						}
 						else
 						{
 							int tempSeed = (int)Mathf.Floor(seed/2*3);
 							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
 							{
-								chunkBlocks[x, y, z].id = 2;
+								chunkBlocks[x, y, z].id = 2; // Stone
+								chunkBlocks[x, y, z].miningLevel = 1;
 							}
 							else
 							{
@@ -282,5 +282,16 @@ public class Chunk : MonoBehaviour
 		{
 			this.gameObject.AddComponent<MeshCollider>();
 		}
+	}
+
+	/// <summary>
+	/// Gets the block closest to the position provided
+	/// </summary>
+	/// <returns>The closest block</returns>
+	/// <param name="position">The position closest to a block</param>
+	public Block getBlock(Vector3 position) {
+		RVector3 rpos = new RVector3(position);
+
+		return chunkBlocks[rpos.x, rpos.y, rpos.z];
 	}
 }

@@ -6,22 +6,20 @@ using System;
 public class PlayerController : MonoBehaviour
 {
 
-	int speed { get; set; }
+	float speed { get; set; }
 
 	Rigidbody rb;
 	BoxCollider boxColl;
 
 	GameObject cameraObject;
 	Camera cam;
-	Vector3 cameraCenter;
-	Vector3 currentVisionCollison = new Vector3(0, 0, 0);
 
-	const float RANGE = 5.0f;
+	const int RANGE = 5;
 
 	// Use this for initialization
 	void Start()
 	{
-		speed = 1;
+		speed = 0.75f;
 
 		rb = this.gameObject.GetComponent<Rigidbody>();
 
@@ -29,6 +27,7 @@ public class PlayerController : MonoBehaviour
 
 		cameraObject = this.transform.Find("Camera").gameObject;
 		cam = cameraObject.GetComponent<Camera>();
+
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
 	}
@@ -39,6 +38,12 @@ public class PlayerController : MonoBehaviour
 
 		UpdateVision();
 		UpdatePosition();
+
+		Block block = GetBlockFromLookVector();
+		if (block != null)
+		{
+			Debug.Log(block.id);
+		}
 	}
 
 	/// <summary>
@@ -93,7 +98,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.forward / 8) * speed)); // Gets point on bounding box that is closest to the new position
 			closestBound += ((transform.forward / 1000) * speed); // Add the moving Vector to the closest point on the bounding box
 
-			if (!Physics.Raycast(this.transform.position, this.transform.forward, 1))
+			if (!Physics.Raycast(this.transform.position, this.transform.forward, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -107,7 +112,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.forward / 18) * speed));
 			closestBound += ((-transform.forward / 1000) * speed);
 
-			if (!Physics.Raycast(this.transform.position, -this.transform.forward, 1))
+			if (!Physics.Raycast(this.transform.position, -this.transform.forward, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -120,7 +125,7 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.right / 10) * speed));
 			closestBound += ((-transform.right / 1000) * speed);
 
-			if (!Physics.Raycast(this.transform.position, -this.transform.right, 1))
+			if (!Physics.Raycast(this.transform.position, -this.transform.right, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -133,15 +138,15 @@ public class PlayerController : MonoBehaviour
 			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.right / 10) * speed));
 			closestBound += ((transform.right / 1000) * speed);
 
-			if (!Physics.Raycast(this.transform.position, this.transform.right, 1))
+			if (!Physics.Raycast(this.transform.position, this.transform.right, 0.5f))
 			{
 				transform.position = closestBound;
 			}
 		}
 
-		if (Input.GetKey("space") && Physics.Raycast(this.transform.position, -transform.up, 1))
+		if (Input.GetKey("space") && Physics.Raycast(this.transform.position, -transform.up, 0.1f))
 		{
-			rb.AddForceAtPosition(transform.up * 270, -transform.up);
+			rb.AddForceAtPosition(transform.up * 500, -transform.up);
 		}
 
 	}
@@ -150,54 +155,22 @@ public class PlayerController : MonoBehaviour
 	/// Gets the block from camera's look vector.
 	/// </summary>
 	/// <returns>The block from look vector. NOTE: This may return null</returns>
-	GameObject GetBlockFromLookVector()
+	Block GetBlockFromLookVector()
 	{
-		cameraCenter = cam.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, cam.nearClipPlane));
+		RaycastHit hit;
+		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
 
-		//Debug.Log(cameraCenter);
-
-		RaycastHit rayHit;
-
-		Ray raycast = new Ray(cameraCenter, cameraObject.transform.forward);
-		if (Physics.Raycast(raycast, out rayHit, RANGE))
-		{
-			if (rayHit.transform.gameObject.CompareTag("Block"))
-			{
-				currentVisionCollison = rayHit.point;
-				return rayHit.transform.gameObject;
-			}
-		}
-
-		return null;
-	}
-
-	/// <summary>
-	/// Gets the block face from look vector.
-	/// </summary>
-	/// <returns>The block face from look vector.</returns>
-	GameObject GetBlockFaceFromLookVector()
-	{
-		GameObject block = GetBlockFromLookVector();
-
-		if (block == null)
+		if (hit.transform == null)
 		{
 			return null;
 		}
 
-		double bestDistance = Int32.MaxValue;
-		double currentDistance;
-		GameObject selectedChild = null;
-
-		foreach (GameObject child in Util.GetChildren(block))
+		if (hit.transform.tag == "Block")
 		{
-			currentDistance = Vector3.Distance(child.transform.position, currentVisionCollison);
-			if (currentDistance < bestDistance)
-			{
-				bestDistance = currentDistance;
-				selectedChild = child;
-			}
+			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
+			return chunk.getBlock(hit.point);
 		}
 
-		return selectedChild;
+		return null;
 	}
 }
