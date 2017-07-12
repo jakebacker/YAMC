@@ -283,4 +283,15 @@ public class Chunk : MonoBehaviour
 			this.gameObject.AddComponent<MeshCollider>();
 		}
 	}
+
+	/// <summary>
+	/// Gets the block closest to the position provided
+	/// </summary>
+	/// <returns>The closest block</returns>
+	/// <param name="position">The position closest to a block</param>
+	public Block getBlock(Vector3 position) {
+		RVector3 rpos = new RVector3(position);
+
+		return chunkBlocks[rpos.x, rpos.y, rpos.z];
+	}
 }
