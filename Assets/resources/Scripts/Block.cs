@@ -12,6 +12,8 @@ public enum BlockFace {
 
 public class Block
 {
+	public RVector3 position;
+
 	public bool empty = false;
 
 	public byte id = 0;

@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
 	GameObject cameraObject;
 	Camera cam;
 
+	public GameObject selectorPrefab;
+
 	const int RANGE = 5;
 
 	// Use this for initialization
@@ -39,11 +41,7 @@ public class PlayerController : MonoBehaviour
 		UpdateVision();
 		UpdatePosition();
 
-		Block block = GetBlockFromLookVector();
-		if (block != null)
-		{
-			Debug.Log(block.id);
-		}
+		SelectBlock();
 	}
 
 	/// <summary>
@@ -155,7 +153,7 @@ public class PlayerController : MonoBehaviour
 	/// Gets the block from camera's look vector.
 	/// </summary>
 	/// <returns>The block from look vector. NOTE: This may return null</returns>
-	Block GetBlockFromLookVector()
+	Block GetBlockFromLookVector() // This needs some tuning
 	{
 		RaycastHit hit;
 		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
@@ -168,7 +166,43 @@ public class PlayerController : MonoBehaviour
 		if (hit.transform.tag == "Block")
 		{
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
-			return chunk.getBlock(hit.point);
+
+			Vector3 changedPoint = hit.point;
+			changedPoint += transform.forward / 100;
+			changedPoint.y -= 0.2f;
+			return chunk.GetBlock(hit.point);
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// Selects the block that the player is looking at
+	/// </summary>
+	/// <returns>The block.</returns>
+	Block SelectBlock() {
+		Block block = GetBlockFromLookVector();
+
+		if (block != null)
+		{
+			GameObject selector = GameObject.Find("Selector");
+
+			if (selector == null)
+			{
+				if (selectorPrefab == null)
+				{
+					Debug.LogError("Selector prefab does not exist!");
+				}
+				else
+				{
+					selector = Instantiate(selectorPrefab);
+					selector.name = "Selector";
+				}
+			}
+
+			selector.transform.position = new Vector3(block.position.x + 0.5f, block.position.y + 0.5f, block.position.z + 0.5f);
+
+			return block;
 		}
 
 		return null;

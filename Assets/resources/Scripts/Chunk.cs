@@ -51,10 +51,12 @@ public class Chunk : MonoBehaviour
 				for (int y = 0; y <= chunkSize.y; y++)
 				{
 					chunkBlocks[x, y, z] = new Block(true);
+					chunkBlocks[x, y, z].position = new RVector3(x, y, z);
 
 					if (y <= chunkHeights[x, z])
 					{
 						chunkBlocks[x, y, z] = new Block(false);
+						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
@@ -289,7 +291,7 @@ public class Chunk : MonoBehaviour
 	/// </summary>
 	/// <returns>The closest block</returns>
 	/// <param name="position">The position closest to a block</param>
-	public Block getBlock(Vector3 position) {
+	public Block GetBlock(Vector3 position) {
 		RVector3 rpos = new RVector3(position);
 
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
