@@ -292,7 +292,7 @@ public class Chunk : MonoBehaviour
 	/// <returns>The closest block</returns>
 	/// <param name="position">The position closest to a block</param>
 	public Block GetBlock(Vector3 position) {
-		RVector3 rpos = new RVector3(position);
+		RVector3 rpos = new RVector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
 
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
 	}

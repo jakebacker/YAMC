@@ -32,6 +32,12 @@ public class PlayerController : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
+
+		Debug.Log(Mathf.FloorToInt(5.0f));
+		Debug.Log(Mathf.FloorToInt(5.1f));
+		Debug.Log(Mathf.FloorToInt(5.5f));
+		Debug.Log(Mathf.FloorToInt(5.9f));
+		Debug.Log(Mathf.FloorToInt(6.0f));
 	}
 
 	// Update is called once per frame
@@ -167,10 +173,17 @@ public class PlayerController : MonoBehaviour
 		{
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
 
-			Vector3 changedPoint = hit.point;
-			changedPoint += transform.forward / 100;
-			changedPoint.y -= 0.2f;
-			return chunk.GetBlock(hit.point);
+
+			Vector3 newPoint = hit.point;
+			newPoint -= new Vector3(0, 0.1f, 0);
+
+			GameObject collMark = GameObject.Find("CollMark");
+			if (collMark != null)
+			{
+				collMark.transform.position = newPoint;
+			}
+
+			return chunk.GetBlock(newPoint);
 		}
 
 		return null;
