@@ -32,22 +32,25 @@ public class PlayerController : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
-
-		Debug.Log(Mathf.FloorToInt(5.0f));
-		Debug.Log(Mathf.FloorToInt(5.1f));
-		Debug.Log(Mathf.FloorToInt(5.5f));
-		Debug.Log(Mathf.FloorToInt(5.9f));
-		Debug.Log(Mathf.FloorToInt(6.0f));
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-
 		UpdateVision();
 		UpdatePosition();
 
 		SelectBlock();
+
+		if (Input.GetMouseButtonDown(0))
+		{
+			Block block = SelectBlock();
+
+			if (block != null)
+			{
+				BreakBlock(block);
+			}
+		}
 	}
 
 	/// <summary>
@@ -155,6 +158,12 @@ public class PlayerController : MonoBehaviour
 
 	}
 
+	void BreakBlock(Block block) {
+		Debug.Log("Breaking Block at " + block.position.ToString());
+		block.Break();
+		block.chunk.RemoveBlock(block);
+	}
+
 	/// <summary>
 	/// Gets the block from camera's look vector.
 	/// </summary>
@@ -219,9 +228,10 @@ public class PlayerController : MonoBehaviour
 	Block SelectBlock() {
 		Block block = GetBlockFromLookVector();
 
+		GameObject selector = GameObject.Find("Selector");
+
 		if (block != null)
 		{
-			GameObject selector = GameObject.Find("Selector");
 
 			if (selector == null)
 			{
@@ -236,11 +246,16 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 
+			selector.SetActive(true);
 			selector.transform.position = new Vector3(block.position.x + 0.5f, block.position.y + 0.5f, block.position.z + 0.5f);
 
 			return block;
 		}
 
+		if (selector != null)
+		{
+			selector.SetActive(false);
+		}
 		return null;
 	}
 		

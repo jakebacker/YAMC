@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class Chunk : MonoBehaviour
 {
 	Mesh chunkMesh;
+	MeshCollider chunkCollider;
 
 	RVector3 chunkPosition;
 	public RVector3 Position{ get{ return chunkPosition;} set{ chunkPosition = value;}}
@@ -35,7 +36,10 @@ public class Chunk : MonoBehaviour
 		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
 
 		chunkMesh = this.GetComponent<MeshFilter>().mesh;
+		chunkMesh.MarkDynamic();
+
 		GenerateChunk();
+		chunkCollider = this.GetComponent<MeshCollider>();
 	}
 
 	public void GenerateChunk() {
@@ -57,6 +61,7 @@ public class Chunk : MonoBehaviour
 					{
 						chunkBlocks[x, y, z] = new Block(false);
 						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
+						chunkBlocks[x, y, z].chunk = this;
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
@@ -295,5 +300,14 @@ public class Chunk : MonoBehaviour
 		RVector3 rpos = new RVector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
 
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
+	}
+
+	public void RemoveBlock(Block block) {
+		RVector3 pos = block.position;
+
+		chunkBlocks[pos.x, pos.y, pos.z].empty = true;
+		UpdateChunk();
+		chunkCollider.enabled = false;
+		chunkCollider.enabled = true;
 	}
 }

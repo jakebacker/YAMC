@@ -14,6 +14,8 @@ public class Block
 {
 	public RVector3 position;
 
+	public Chunk chunk;
+
 	public bool empty = false;
 
 	public byte id = 0;
@@ -33,5 +35,9 @@ public class Block
 	public Block(bool isEmpty)
 	{
 		empty = isEmpty; 
+	}
+
+	public void Break() {
+		// This is run when the block is broken
 	}
 }
