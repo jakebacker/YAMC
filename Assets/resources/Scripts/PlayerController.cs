@@ -158,11 +158,12 @@ public class PlayerController : MonoBehaviour
 	/// <summary>
 	/// Gets the block from camera's look vector.
 	/// </summary>
-	/// <returns>The block from look vector. NOTE: This may return null</returns>
+	/// <returns>The block from look vector</returns>
 	Block GetBlockFromLookVector() // This needs some tuning
 	{
 		RaycastHit hit;
 		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
+
 
 		if (hit.transform == null)
 		{
@@ -173,9 +174,31 @@ public class PlayerController : MonoBehaviour
 		{
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
 
-
 			Vector3 newPoint = hit.point;
-			newPoint -= new Vector3(0, 0.1f, 0);
+			//newPoint -= new Vector3(0, 0.1f, 0);
+			//newPoint += cam.transform.forward;
+
+			switch (GetBlockSide(hit))
+			{
+				case BlockFace.Top:
+					newPoint -= new Vector3(0, 0.1f, 0);
+					break;
+				case BlockFace.Bottom:
+					newPoint += new Vector3(0, 0.1f, 0);
+					break;
+				case BlockFace.Right:
+					newPoint -= new Vector3(0.1f, 0, 0);
+					break;
+				case BlockFace.Left:
+					newPoint += new Vector3(0.1f, 0, 0);
+					break;
+				case BlockFace.Near:
+					newPoint += new Vector3(0, 0, 0.1f);
+					break;
+				case BlockFace.Far:
+					newPoint -= new Vector3(0, 0, 0.1f);
+					break;
+			}
 
 			GameObject collMark = GameObject.Find("CollMark");
 			if (collMark != null)
@@ -219,5 +242,40 @@ public class PlayerController : MonoBehaviour
 		}
 
 		return null;
+	}
+		
+	BlockFace GetBlockSide(RaycastHit hit) {
+		BlockFace face = BlockFace.All;
+
+		Vector3 normal = hit.normal;
+
+		normal = hit.transform.TransformDirection(normal);
+
+		if (normal == hit.transform.up)
+		{
+			face = BlockFace.Top;
+		}
+		else if (normal == -hit.transform.up)
+		{
+			face = BlockFace.Bottom;
+		}
+		else if (normal == hit.transform.right)
+		{
+			face = BlockFace.Right;
+		}
+		else if (normal == -hit.transform.right)
+		{
+			face = BlockFace.Left;
+		}
+		else if (normal == hit.transform.forward)
+		{
+			face = BlockFace.Far;
+		}
+		else if (normal == -hit.transform.forward)
+		{
+			face = BlockFace.Near;
+		}
+
+		return face;
 	}
 }
