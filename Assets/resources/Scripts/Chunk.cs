@@ -8,6 +8,8 @@ public class Chunk : MonoBehaviour
 	Mesh chunkMesh;
 	MeshCollider chunkCollider;
 
+	Bounds bounds;
+
 	RVector3 chunkPosition;
 	public RVector3 Position{ get{ return chunkPosition;} set{ chunkPosition = value;}}
 
@@ -40,6 +42,8 @@ public class Chunk : MonoBehaviour
 
 		GenerateChunk();
 		chunkCollider = this.GetComponent<MeshCollider>();
+
+		bounds.SetMinMax(this.transform.position, this.transform.position+chunkSize);
 	}
 
 	public void GenerateChunk() {
@@ -279,6 +283,11 @@ public class Chunk : MonoBehaviour
 		chunkUV.Add(new Vector2(textureID.x,textureID.y));
 	}
 
+	void UpdateCollider() {
+		chunkCollider.enabled = false;
+		chunkCollider.enabled = true;
+	}
+
 	void FinalizeChunk() {
 		chunkMesh.vertices = chunkVerticies.ToArray();
 		chunkMesh.triangles = chunkTriangles.ToArray();
@@ -307,7 +316,24 @@ public class Chunk : MonoBehaviour
 
 		chunkBlocks[pos.x, pos.y, pos.z].empty = true;
 		UpdateChunk();
-		chunkCollider.enabled = false;
-		chunkCollider.enabled = true;
+		UpdateCollider();
+	}
+
+	public Block AddBlock(byte id, RVector3 position) {
+		if (bounds.Contains(position.ToVector3()))
+		{
+			Block block = new Block(false);
+			block.id = id;
+			block.position = position;
+			block.chunk = this;
+			chunkBlocks[position.x, position.y, position.z] = block;
+
+			UpdateChunk();
+			UpdateCollider();
+
+			return block;
+		}
+		Debug.Log("Block not in chunk!");
+		return null;
 	}
 }

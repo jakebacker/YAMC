@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 	Camera cam;
 
 	public GameObject selectorPrefab;
+	GameObject selector;
 
 	const int RANGE = 5;
 
@@ -32,6 +33,8 @@ public class PlayerController : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
+
+		selector = GameObject.Find("Selector");
 	}
 
 	// Update is called once per frame
@@ -51,6 +54,10 @@ public class PlayerController : MonoBehaviour
 				BreakBlock(block);
 			}
 		}
+		else if (Input.GetMouseButtonDown(1))
+		{
+			PlaceBlock(2);	
+		}
 	}
 
 	/// <summary>
@@ -69,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
 		// HACK: This is horrible... 80 is also a totally random number
 		// FIXME: This needs to allow looking down
-		if ((newCamPos.x > 55 && newCamPos.x < 80) || newCamPos.x < -180)
+		if ((newCamPos.x > 70 && newCamPos.x < 90) || newCamPos.x < -180)
 		{
 			newCamPos.x = currentCamPos.x;
 		}
@@ -159,16 +166,60 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void BreakBlock(Block block) {
-		Debug.Log("Breaking Block at " + block.position.ToString());
 		block.Break();
 		block.chunk.RemoveBlock(block);
+	}
+
+	Block PlaceBlock(byte id) {
+		BlockFace side = BlockFace.All;
+		Block block = GetBlockFromLookVector(out side);
+
+		if (side == BlockFace.All || block == null)
+		{
+			return null;
+		}
+
+		RVector3 newPosition = new RVector3(block.position.ToVector3());
+
+		switch(side) {
+			case BlockFace.Bottom:
+				newPosition.y -= 1;
+				break;
+			case BlockFace.Top:
+				newPosition.y += 1;
+				break;
+			case BlockFace.Far:
+				newPosition.z += 1;
+				break;
+			case BlockFace.Near:
+				newPosition.z -= 1;
+				break;
+			case BlockFace.Left:
+				newPosition.x -= 1;
+				break;
+			case BlockFace.Right:
+				newPosition.x += 1;
+				break;
+		}
+
+		Vector3 center = newPosition.ToVector3();
+		center.x += 0.5f;
+		center.y += 0.5f;
+		center.z += 0.5f;
+
+		if (Physics.OverlapBox(center, new Vector3(0.4f, 0.4f, 0.4f)).Length == 0)
+		{
+			return block.chunk.AddBlock(3, newPosition); // This is going to change
+		}
+
+		return null;
 	}
 
 	/// <summary>
 	/// Gets the block from camera's look vector.
 	/// </summary>
 	/// <returns>The block from look vector</returns>
-	Block GetBlockFromLookVector() // This needs some tuning
+	Block GetBlockFromLookVector(out BlockFace side)
 	{
 		RaycastHit hit;
 		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
@@ -176,6 +227,7 @@ public class PlayerController : MonoBehaviour
 
 		if (hit.transform == null)
 		{
+			side = BlockFace.All;
 			return null;
 		}
 
@@ -184,10 +236,11 @@ public class PlayerController : MonoBehaviour
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
 
 			Vector3 newPoint = hit.point;
-			//newPoint -= new Vector3(0, 0.1f, 0);
-			//newPoint += cam.transform.forward;
 
-			switch (GetBlockSide(hit))
+
+			BlockFace face = GetBlockSide(hit);
+			side = face;
+			switch (face)
 			{
 				case BlockFace.Top:
 					newPoint -= new Vector3(0, 0.1f, 0);
@@ -218,7 +271,14 @@ public class PlayerController : MonoBehaviour
 			return chunk.GetBlock(newPoint);
 		}
 
+		side = BlockFace.All;
+
 		return null;
+	}
+
+	Block GetBlockFromLookVector() {
+		BlockFace temp;
+		return GetBlockFromLookVector(out temp);
 	}
 
 	/// <summary>
@@ -227,8 +287,6 @@ public class PlayerController : MonoBehaviour
 	/// <returns>The block.</returns>
 	Block SelectBlock() {
 		Block block = GetBlockFromLookVector();
-
-		GameObject selector = GameObject.Find("Selector");
 
 		if (block != null)
 		{
