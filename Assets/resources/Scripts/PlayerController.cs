@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
 	GameObject cameraObject;
 	Camera cam;
 
+	public GameObject selectorPrefab;
+	GameObject selector;
+
 	const int RANGE = 5;
 
 	// Use this for initialization
@@ -30,19 +33,30 @@ public class PlayerController : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
+
+		selector = GameObject.Find("Selector");
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-
 		UpdateVision();
 		UpdatePosition();
 
-		Block block = GetBlockFromLookVector();
-		if (block != null)
+		SelectBlock();
+
+		if (Input.GetMouseButtonDown(0))
 		{
-			Debug.Log(block.id);
+			Block block = SelectBlock();
+
+			if (block != null)
+			{
+				BreakBlock(block);
+			}
+		}
+		else if (Input.GetMouseButtonDown(1))
+		{
+			PlaceBlock(2);	
 		}
 	}
 
@@ -62,7 +76,7 @@ public class PlayerController : MonoBehaviour
 
 		// HACK: This is horrible... 80 is also a totally random number
 		// FIXME: This needs to allow looking down
-		if ((newCamPos.x > 55 && newCamPos.x < 80) || newCamPos.x < -180)
+		if ((newCamPos.x > 70 && newCamPos.x < 90) || newCamPos.x < -180)
 		{
 			newCamPos.x = currentCamPos.x;
 		}
@@ -151,26 +165,190 @@ public class PlayerController : MonoBehaviour
 
 	}
 
+	void BreakBlock(Block block) {
+		block.Break();
+		block.chunk.RemoveBlock(block);
+	}
+
+	Block PlaceBlock(byte id) {
+		BlockFace side = BlockFace.All;
+		Block block = GetBlockFromLookVector(out side);
+
+		if (side == BlockFace.All || block == null)
+		{
+			return null;
+		}
+
+		RVector3 newPosition = new RVector3(block.position.ToVector3());
+
+		switch(side) {
+			case BlockFace.Bottom:
+				newPosition.y -= 1;
+				break;
+			case BlockFace.Top:
+				newPosition.y += 1;
+				break;
+			case BlockFace.Far:
+				newPosition.z += 1;
+				break;
+			case BlockFace.Near:
+				newPosition.z -= 1;
+				break;
+			case BlockFace.Left:
+				newPosition.x -= 1;
+				break;
+			case BlockFace.Right:
+				newPosition.x += 1;
+				break;
+		}
+
+		Vector3 center = newPosition.ToVector3();
+		center.x += 0.5f;
+		center.y += 0.5f;
+		center.z += 0.5f;
+
+		if (Physics.OverlapBox(center, new Vector3(0.4f, 0.4f, 0.4f)).Length == 0)
+		{
+			return block.chunk.AddBlock(3, newPosition); // This is going to change
+		}
+
+		return null;
+	}
+
 	/// <summary>
 	/// Gets the block from camera's look vector.
 	/// </summary>
-	/// <returns>The block from look vector. NOTE: This may return null</returns>
-	Block GetBlockFromLookVector()
+	/// <returns>The block from look vector</returns>
+	Block GetBlockFromLookVector(out BlockFace side)
 	{
 		RaycastHit hit;
 		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
 
+
 		if (hit.transform == null)
 		{
+			side = BlockFace.All;
 			return null;
 		}
 
 		if (hit.transform.tag == "Block")
 		{
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
-			return chunk.getBlock(hit.point);
+
+			Vector3 newPoint = hit.point;
+
+
+			BlockFace face = GetBlockSide(hit);
+			side = face;
+			switch (face)
+			{
+				case BlockFace.Top:
+					newPoint -= new Vector3(0, 0.1f, 0);
+					break;
+				case BlockFace.Bottom:
+					newPoint += new Vector3(0, 0.1f, 0);
+					break;
+				case BlockFace.Right:
+					newPoint -= new Vector3(0.1f, 0, 0);
+					break;
+				case BlockFace.Left:
+					newPoint += new Vector3(0.1f, 0, 0);
+					break;
+				case BlockFace.Near:
+					newPoint += new Vector3(0, 0, 0.1f);
+					break;
+				case BlockFace.Far:
+					newPoint -= new Vector3(0, 0, 0.1f);
+					break;
+			}
+
+			GameObject collMark = GameObject.Find("CollMark");
+			if (collMark != null)
+			{
+				collMark.transform.position = newPoint;
+			}
+
+			return chunk.GetBlock(newPoint);
 		}
 
+		side = BlockFace.All;
+
 		return null;
+	}
+
+	Block GetBlockFromLookVector() {
+		BlockFace temp;
+		return GetBlockFromLookVector(out temp);
+	}
+
+	/// <summary>
+	/// Selects the block that the player is looking at
+	/// </summary>
+	/// <returns>The block.</returns>
+	Block SelectBlock() {
+		Block block = GetBlockFromLookVector();
+
+		if (block != null)
+		{
+
+			if (selector == null)
+			{
+				if (selectorPrefab == null)
+				{
+					Debug.LogError("Selector prefab does not exist!");
+				}
+				else
+				{
+					selector = Instantiate(selectorPrefab);
+					selector.name = "Selector";
+				}
+			}
+
+			selector.SetActive(true);
+			selector.transform.position = new Vector3(block.position.x + 0.5f, block.position.y + 0.5f, block.position.z + 0.5f);
+
+			return block;
+		}
+
+		if (selector != null)
+		{
+			selector.SetActive(false);
+		}
+		return null;
+	}
+		
+	BlockFace GetBlockSide(RaycastHit hit) {
+		BlockFace face = BlockFace.All;
+
+		Vector3 normal = hit.normal;
+
+		normal = hit.transform.TransformDirection(normal);
+
+		if (normal == hit.transform.up)
+		{
+			face = BlockFace.Top;
+		}
+		else if (normal == -hit.transform.up)
+		{
+			face = BlockFace.Bottom;
+		}
+		else if (normal == hit.transform.right)
+		{
+			face = BlockFace.Right;
+		}
+		else if (normal == -hit.transform.right)
+		{
+			face = BlockFace.Left;
+		}
+		else if (normal == hit.transform.forward)
+		{
+			face = BlockFace.Far;
+		}
+		else if (normal == -hit.transform.forward)
+		{
+			face = BlockFace.Near;
+		}
+
+		return face;
 	}
 }

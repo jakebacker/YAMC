@@ -6,6 +6,9 @@ using System.Collections.Generic;
 public class Chunk : MonoBehaviour
 {
 	Mesh chunkMesh;
+	MeshCollider chunkCollider;
+
+	Bounds bounds;
 
 	RVector3 chunkPosition;
 	public RVector3 Position{ get{ return chunkPosition;} set{ chunkPosition = value;}}
@@ -35,7 +38,12 @@ public class Chunk : MonoBehaviour
 		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
 
 		chunkMesh = this.GetComponent<MeshFilter>().mesh;
+		chunkMesh.MarkDynamic();
+
 		GenerateChunk();
+		chunkCollider = this.GetComponent<MeshCollider>();
+
+		bounds.SetMinMax(this.transform.position, this.transform.position+chunkSize);
 	}
 
 	public void GenerateChunk() {
@@ -51,10 +59,13 @@ public class Chunk : MonoBehaviour
 				for (int y = 0; y <= chunkSize.y; y++)
 				{
 					chunkBlocks[x, y, z] = new Block(true);
+					chunkBlocks[x, y, z].position = new RVector3(x, y, z);
 
 					if (y <= chunkHeights[x, z])
 					{
 						chunkBlocks[x, y, z] = new Block(false);
+						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
+						chunkBlocks[x, y, z].chunk = this;
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
@@ -272,6 +283,11 @@ public class Chunk : MonoBehaviour
 		chunkUV.Add(new Vector2(textureID.x,textureID.y));
 	}
 
+	void UpdateCollider() {
+		chunkCollider.enabled = false;
+		chunkCollider.enabled = true;
+	}
+
 	void FinalizeChunk() {
 		chunkMesh.vertices = chunkVerticies.ToArray();
 		chunkMesh.triangles = chunkTriangles.ToArray();
@@ -289,9 +305,35 @@ public class Chunk : MonoBehaviour
 	/// </summary>
 	/// <returns>The closest block</returns>
 	/// <param name="position">The position closest to a block</param>
-	public Block getBlock(Vector3 position) {
-		RVector3 rpos = new RVector3(position);
+	public Block GetBlock(Vector3 position) {
+		RVector3 rpos = new RVector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
 
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
+	}
+
+	public void RemoveBlock(Block block) {
+		RVector3 pos = block.position;
+
+		chunkBlocks[pos.x, pos.y, pos.z].empty = true;
+		UpdateChunk();
+		UpdateCollider();
+	}
+
+	public Block AddBlock(byte id, RVector3 position) {
+		if (bounds.Contains(position.ToVector3()))
+		{
+			Block block = new Block(false);
+			block.id = id;
+			block.position = position;
+			block.chunk = this;
+			chunkBlocks[position.x, position.y, position.z] = block;
+
+			UpdateChunk();
+			UpdateCollider();
+
+			return block;
+		}
+		Debug.Log("Block not in chunk!");
+		return null;
 	}
 }
