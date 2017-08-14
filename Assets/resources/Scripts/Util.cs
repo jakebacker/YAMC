@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Util
 {
+
+	public static int maxInt = Int32.MaxValue;
 
 	/// <summary>
 	/// Gets the children of a block.

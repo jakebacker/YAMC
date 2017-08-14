@@ -18,7 +18,7 @@ public class Block
 
 	public bool empty = false;
 
-	public byte id = 0;
+	public byte id;
 
 	/*
 	 * Mining Levels:
@@ -37,7 +37,11 @@ public class Block
 		empty = isEmpty; 
 	}
 
-	public void Break() {
-		// This is run when the block is broken
+	public Block(Block block) {
+		id = block.id;
+		miningLevel = block.miningLevel;
+	}
+
+	public virtual void Break() {
 	}
 }

@@ -33,12 +33,17 @@ public class Chunk : MonoBehaviour
 	Texture textureAtlas;
 	Vector2 atlasSize;
 
-	void Awake () {
+	void Start () {
 		textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
 		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
 
 		chunkMesh = this.GetComponent<MeshFilter>().mesh;
 		chunkMesh.MarkDynamic();
+
+		if (seed < 0)
+		{
+			seed = Random.Range(0, (int)Mathf.Round(Util.maxInt/500));
+		}
 
 		GenerateChunk();
 		chunkCollider = this.GetComponent<MeshCollider>();
@@ -64,31 +69,32 @@ public class Chunk : MonoBehaviour
 					if (y <= chunkHeights[x, z])
 					{
 						chunkBlocks[x, y, z] = new Block(false);
-						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
-						chunkBlocks[x, y, z].chunk = this;
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
-							chunkBlocks[x, y, z].id = 0; // Grass
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(0)); // Grass
 						}
 						else if (y >= chunkHeights[x, z] - 5)
 						{
-							chunkBlocks[x, y, z].id = 1; // Dirt
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
 						}
 						else
 						{
 							int tempSeed = (int)Mathf.Floor(seed/2*3);
 							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
 							{
-								chunkBlocks[x, y, z].id = 2; // Stone
+								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)); // Stone
 								chunkBlocks[x, y, z].miningLevel = 1;
 							}
 							else
 							{
-								chunkBlocks[x, y, z].id = 1;
+								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1));
 							}
 
 						}
+
+						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
+						chunkBlocks[x, y, z].chunk = this;
 
 					}
 				}
@@ -319,11 +325,10 @@ public class Chunk : MonoBehaviour
 		UpdateCollider();
 	}
 
-	public Block AddBlock(byte id, RVector3 position) {
+	public Block AddBlock(Block blockProto, RVector3 position) {
 		if (bounds.Contains(position.ToVector3()))
 		{
-			Block block = new Block(false);
-			block.id = id;
+			Block block = new Block(blockProto);
 			block.position = position;
 			block.chunk = this;
 			chunkBlocks[position.x, position.y, position.z] = block;

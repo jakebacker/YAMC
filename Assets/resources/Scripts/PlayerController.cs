@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
 		}
 		else if (Input.GetMouseButtonDown(1))
 		{
-			PlaceBlock(2);	
+			PlaceBlock(Game.register.GetBlock(3));	
 		}
 	}
 
@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour
 		block.chunk.RemoveBlock(block);
 	}
 
-	Block PlaceBlock(byte id) {
+	Block PlaceBlock(Block blockProto) {
 		BlockFace side = BlockFace.All;
 		Block block = GetBlockFromLookVector(out side);
 
@@ -209,7 +209,7 @@ public class PlayerController : MonoBehaviour
 
 		if (Physics.OverlapBox(center, new Vector3(0.4f, 0.4f, 0.4f)).Length == 0)
 		{
-			return block.chunk.AddBlock(3, newPosition); // This is going to change
+			return block.chunk.AddBlock(blockProto, newPosition); // This is going to change
 		}
 
 		return null;
