@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
 	public GameObject selectorPrefab;
 	GameObject selector;
 
+	Block[] hotbar;
+	int currentSelection = 1; // Number between 1 and 9
+
 	const int RANGE = 5;
 
 	// Use this for initialization
@@ -33,6 +36,23 @@ public class PlayerController : MonoBehaviour
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
+
+		// Initialize hotbar
+		hotbar = new Block[9];
+		for (int i = 0; i < hotbar.Length; i++)
+		{
+			hotbar[i] = new Block(true);
+		}
+
+		hotbar[0] = Game.register.GetBlock(0);
+		hotbar[1] = Game.register.GetBlock(1);
+		hotbar[2] = Game.register.GetBlock(2);
+		hotbar[3] = Game.register.GetBlock(3);
+		hotbar[4] = Game.register.GetBlock(4);
+		hotbar[5] = Game.register.GetBlock(5);
+		hotbar[6] = Game.register.GetBlock(6);
+		hotbar[7] = Game.register.GetBlock(7);
+		hotbar[8] = Game.register.GetBlock(8);
 
 		selector = GameObject.Find("Selector");
 	}
@@ -56,8 +76,35 @@ public class PlayerController : MonoBehaviour
 		}
 		else if (Input.GetMouseButtonDown(1))
 		{
-			PlaceBlock(Game.register.GetBlock(3));	
+			Debug.Log(currentSelection);
+			PlaceBlock(hotbar[currentSelection-1]);	
 		}
+
+		// Select block
+		if (Input.mouseScrollDelta.y > 0) // Right
+		{
+			if (currentSelection == 9)
+			{
+				currentSelection = 1;
+			}
+			else
+			{
+				currentSelection++;
+			}
+		}
+		else if (Input.mouseScrollDelta.y < 0)
+		{
+			if (currentSelection == 1)
+			{
+				currentSelection = 9;
+			}
+			else
+			{
+				currentSelection--;
+			}
+		}
+
+
 	}
 
 	/// <summary>

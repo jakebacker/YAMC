@@ -33,6 +33,8 @@ public class Chunk : MonoBehaviour
 	Texture textureAtlas;
 	Vector2 atlasSize;
 
+	bool hasGenerated = false;
+
 	void Start () {
 		textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
 		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
@@ -45,10 +47,23 @@ public class Chunk : MonoBehaviour
 			seed = Random.Range(0, (int)Mathf.Round(Util.maxInt/500));
 		}
 
-		GenerateChunk();
-		chunkCollider = this.GetComponent<MeshCollider>();
+		if (Game.hasStarted)
+		{
+			GenerateChunk();
+			chunkCollider = this.GetComponent<MeshCollider>();
 
-		bounds.SetMinMax(this.transform.position, this.transform.position+chunkSize);
+			bounds.SetMinMax(this.transform.position, this.transform.position + chunkSize);
+		}
+	}
+
+	void Update() {
+		if (Game.hasStarted && !hasGenerated)
+		{
+			GenerateChunk();
+			chunkCollider = this.GetComponent<MeshCollider>();
+
+			bounds.SetMinMax(this.transform.position, this.transform.position + chunkSize);
+		}
 	}
 
 	public void GenerateChunk() {
@@ -101,6 +116,7 @@ public class Chunk : MonoBehaviour
 			}
 		}
 
+		hasGenerated = true;
 		UpdateChunk();
 	}
 

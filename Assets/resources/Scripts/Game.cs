@@ -5,6 +5,7 @@ using UnityEngine;
 public class Game : MonoBehaviour {
 
 	public static Register register;
+	public static bool hasStarted = false;
 
 	// Use this for initialization
 	void Start () {
@@ -15,6 +16,8 @@ public class Game : MonoBehaviour {
 		PreInit();
 		Init();
 		PostInit();
+		Debug.Log("Started");
+		hasStarted = true;
 	}
 	
 	// Update is called once per frame
@@ -76,5 +79,9 @@ public class Game : MonoBehaviour {
 		Block woodBlock = new Block(false);
 		woodBlock.id = 4;
 		register.AddBlock(woodBlock, 4);
+
+		Block coalOre = new Block(false);
+		coalOre.id = 5;
+		register.AddBlock(coalOre, 5);
 	}
 }
