@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
 
 	const int RANGE = 5;
 
+	bool isHotbarInit = false;
+
 	// Use this for initialization
 	void Start()
 	{
@@ -44,15 +46,19 @@ public class PlayerController : MonoBehaviour
 			hotbar[i] = new Block(true);
 		}
 
-		hotbar[0] = Game.register.GetBlock(0);
-		hotbar[1] = Game.register.GetBlock(1);
-		hotbar[2] = Game.register.GetBlock(2);
-		hotbar[3] = Game.register.GetBlock(3);
-		hotbar[4] = Game.register.GetBlock(4);
-		hotbar[5] = Game.register.GetBlock(5);
-		hotbar[6] = Game.register.GetBlock(6);
-		hotbar[7] = Game.register.GetBlock(7);
-		hotbar[8] = Game.register.GetBlock(8);
+		if (Game.hasStarted)
+		{
+			hotbar[0] = (Block)Game.register.GetBlock(0);
+			hotbar[1] = (Block)Game.register.GetBlock(1);
+			hotbar[2] = (Block)Game.register.GetBlock(2);
+			hotbar[3] = (Block)Game.register.GetBlock(3);
+			hotbar[4] = (Block)Game.register.GetBlock(4);
+			hotbar[5] = (Block)Game.register.GetBlock(5);
+			hotbar[6] = (Block)Game.register.GetBlock(6);
+			hotbar[7] = (Block)Game.register.GetBlock(7);
+			hotbar[8] = (Block)Game.register.GetBlock(8);
+			isHotbarInit = true;
+		}
 
 		selector = GameObject.Find("Selector");
 	}
@@ -60,6 +66,20 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		if (Game.hasStarted && !isHotbarInit)
+		{
+			hotbar[0] = (Block)Game.register.GetBlock(0);
+			hotbar[1] = (Block)Game.register.GetBlock(1);
+			hotbar[2] = (Block)Game.register.GetBlock(2);
+			hotbar[3] = (Block)Game.register.GetBlock(3);
+			hotbar[4] = (Block)Game.register.GetBlock(4);
+			hotbar[5] = (Block)Game.register.GetBlock(5);
+			hotbar[6] = (Block)Game.register.GetBlock(6);
+			hotbar[7] = (Block)Game.register.GetBlock(7);
+			hotbar[8] = (Block)Game.register.GetBlock(8);
+			isHotbarInit = true;
+		}
+
 		UpdateVision();
 		UpdatePosition();
 

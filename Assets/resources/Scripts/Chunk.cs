@@ -87,23 +87,23 @@ public class Chunk : MonoBehaviour
 
 						if (y == Mathf.Floor(chunkHeights[x, z]))
 						{
-							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(0)); // Grass
+							chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(0)); // Grass
 						}
 						else if (y >= chunkHeights[x, z] - 5)
 						{
-							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
+							chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1)); // Dirt
 						}
 						else
 						{
 							int tempSeed = (int)Mathf.Floor(seed/2*3);
 							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
 							{
-								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)); // Stone
+								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(2)); // Stone
 								chunkBlocks[x, y, z].miningLevel = 1;
 							}
 							else
 							{
-								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1));
+								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1));
 							}
 
 						}

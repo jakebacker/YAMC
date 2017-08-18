@@ -10,7 +10,7 @@ public enum BlockFace {
 	Near //Z-
 }
 
-public class Block
+public class Block : Item
 {
 	public RVector3 position;
 

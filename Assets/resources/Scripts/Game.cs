@@ -62,26 +62,26 @@ public class Game : MonoBehaviour {
 	private void RegisterBlocks() {
 		Block grassBlock = new Block(false);
 		grassBlock.id = 0;
-		register.AddBlock(grassBlock, 0);
+		register.AddItem(grassBlock, 0);
 
 		Block dirtBlock = new Block(false);
 		dirtBlock.id = 1;
-		register.AddBlock(dirtBlock, 1);
+		register.AddItem(dirtBlock, 1);
 
 		Block stoneBlock = new Block(false);
 		stoneBlock.id = 2;
-		register.AddBlock(stoneBlock, 2);
+		register.AddItem(stoneBlock, 2);
 
 		Block woodenPlanksBlock = new Block(false);
 		woodenPlanksBlock.id = 3;
-		register.AddBlock(woodenPlanksBlock, 3);
+		register.AddItem(woodenPlanksBlock, 3);
 
 		Block woodBlock = new Block(false);
 		woodBlock.id = 4;
-		register.AddBlock(woodBlock, 4);
+		register.AddItem(woodBlock, 4);
 
 		Block coalOre = new Block(false);
 		coalOre.id = 5;
-		register.AddBlock(coalOre, 5);
+		register.AddItem(coalOre, 5);
 	}
 }

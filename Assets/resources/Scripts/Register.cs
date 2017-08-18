@@ -4,29 +4,39 @@ using UnityEngine;
 
 public class Register {
 
-	private List<Block> blocks = new List<Block>(); 
+	private List<Item> items = new List<Item>(); 
 	private List<Mod> mods = new List<Mod>();
 
-	public void AddBlock(Block block, byte id) {
-		blocks.Insert(id, block);
+	public void AddItem(Item item, byte id) {
+		items.Insert(id, item);
 	}
 
-	public void AddBlock(Block block) {
-		blocks.Add(block);
+	public void AddItem(Item item) {
+		items.Add(item);
+	}
+
+	public Item GetItem(byte id) {
+
+		if (id+1 <= items.Count)
+		{
+			return items[id];
+		}
+
+		Item item = new Item();
+		return item;
 	}
 
 	public Block GetBlock(byte id) {
-
-		if (id+1 <= blocks.Capacity)
+		if (id + 1 <= items.Count)
 		{
-			return blocks[id];
+			if (items[id] is Block)
+			{
+				return (Block)items[id];
+			}
 		}
-		else
-		{
-			Block block = new Block(false);
-			block.id = id;
-			return block;
-		}
+		Block block = new Block(true);
+		block.id = id;
+		return block;
 	}
 
 	public List<Mod> GetMods() {
