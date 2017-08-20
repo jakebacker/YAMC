@@ -68,7 +68,7 @@ public class Chunk : MonoBehaviour
 
 	public void GenerateChunk() {
 
-		float[,] chunkHeights = Noise.Generate(chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
+		float[,] chunkHeights = Noise.Generate(new RVector3(this.transform.position), chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
 
 		chunkBlocks = new Block[chunkSize.x + 1, chunkSize.y + 1, chunkSize.z + 1];
 
