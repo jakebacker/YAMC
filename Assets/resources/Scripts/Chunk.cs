@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 [System.Serializable]
 public class Chunk : MonoBehaviour
@@ -85,7 +87,7 @@ public class Chunk : MonoBehaviour
 					{
 						chunkBlocks[x, y, z] = new Block(false);
 
-						if (y == Mathf.Floor(chunkHeights[x, z]))
+						if (y == (int)Mathf.Floor(chunkHeights[x, z]))
 						{
 							chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(0)); // Grass
 						}
@@ -95,19 +97,25 @@ public class Chunk : MonoBehaviour
 						}
 						else
 						{
-							int tempSeed = (int)Mathf.Floor(seed/2*3);
-							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
+							//int tempSeed = (int)Mathf.Floor(seed/2*3);
+							Debug.Log("X: " + x);
+							Debug.Log("Y: " + y);
+							Debug.Log("Seed: " + seed);
+							Debug.Log("Noise: " + Mathf.PerlinNoise(seed + x + 0.1f, seed + y + 0.1f));
+							float noise = Mathf.PerlinNoise(seed + x, seed + y);
+							noise -= (float)Math.Truncate(noise);
+							if (noise < 0.5)
 							{
 								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(2)); // Stone
 								chunkBlocks[x, y, z].miningLevel = 1;
 							}
 							else
 							{
-								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1));
+								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1)); // Dirt
 							}
 
 						}
-
+						
 						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
 						chunkBlocks[x, y, z].chunk = this;
 
