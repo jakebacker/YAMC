@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public class Game : MonoBehaviour {
 
@@ -17,6 +18,7 @@ public class Game : MonoBehaviour {
 		Init();
 		PostInit();
 		Debug.Log("Started");
+		Debug.Log("Time Elapsed: " + Time.realtimeSinceStartup + " seconds");
 		hasStarted = true;
 	}
 	

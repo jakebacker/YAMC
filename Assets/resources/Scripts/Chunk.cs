@@ -37,7 +37,10 @@ public class Chunk : MonoBehaviour
 
 	bool hasGenerated = false;
 
-	void Start () {
+	void Start ()
+	{
+
+		chunkPosition = new RVector3(this.transform.position);
 		textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
 		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
 
@@ -98,10 +101,11 @@ public class Chunk : MonoBehaviour
 						else
 						{
 							//int tempSeed = (int)Mathf.Floor(seed/2*3);
-							Debug.Log("X: " + x);
+							
+							/*Debug.Log("X: " + x);
 							Debug.Log("Y: " + y);
 							Debug.Log("Seed: " + seed);
-							Debug.Log("Noise: " + Mathf.PerlinNoise(seed + x + 0.1f, seed + y + 0.1f));
+							Debug.Log("Noise: " + Mathf.PerlinNoise(seed + x + 0.1f, seed + y + 0.1f));*/
 							float noise = Mathf.PerlinNoise(seed + x, seed + y);
 							noise -= (float)Math.Truncate(noise);
 							if (noise < 0.5)
@@ -338,6 +342,10 @@ public class Chunk : MonoBehaviour
 	public Block GetBlock(Vector3 position) {
 		RVector3 rpos = new RVector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
 
+		rpos.x -= chunkPosition.x;
+		rpos.z -= chunkPosition.z;
+		
+		Debug.Log("Get Block at: " + rpos.ToString());
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
 	}
 

@@ -52,6 +52,11 @@ public class RVector3
 		return new RVector3(a.x * b, a.y * b, a.z * b);
 	}
 
+	public static RVector3 operator +(RVector3 a, RVector3 b)
+	{
+		return new RVector3(a.x+b.x, a.y+b.y,a.z+b.z);
+	}
+
 	public static implicit operator Vector3(RVector3 a)
 	{
 		return (Vector3)a.ToVector3();

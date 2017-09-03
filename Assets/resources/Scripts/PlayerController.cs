@@ -371,8 +371,12 @@ public class PlayerController : MonoBehaviour
 				}
 			}
 
+			RVector3 pos = block.position;
+			pos += block.chunk.Position;
+			pos.y = block.position.y;	
+			
 			selector.SetActive(true);
-			selector.transform.position = new Vector3(block.position.x + 0.5f, block.position.y + 0.5f, block.position.z + 0.5f);
+			selector.transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
 
 			return block;
 		}
