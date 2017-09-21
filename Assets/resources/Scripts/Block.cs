@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 public enum BlockFace {
 	All,
 	Top, //Y+
@@ -16,7 +15,7 @@ public class Block
 
 	public Chunk chunk;
 
-	public bool empty = false;
+	public bool empty;
 
 	public byte id;
 
@@ -30,7 +29,7 @@ public class Block
 	 * 3: Iron
 	 * 4: Diamond
 	 */
-	public byte miningLevel = 0;
+	public byte miningLevel;
 
 	public Block ReturnBlock {get{return this;}}
 

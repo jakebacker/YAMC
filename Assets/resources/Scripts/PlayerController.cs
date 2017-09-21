@@ -1,83 +1,83 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
+using UnityEngine;
+// ReSharper disable UnusedMethodReturnValue.Local
 
 public class PlayerController : MonoBehaviour
 {
 
-	float speed { get; set; }
+	public float speed { get; private set; }
 
-	Rigidbody rb;
-	BoxCollider boxColl;
+	private Rigidbody _rb;
+	private BoxCollider _boxColl;
 
-	GameObject cameraObject;
-	Camera cam;
+	private GameObject _cameraObject;
+	private Camera _cam;
 
 	public GameObject selectorPrefab;
-	GameObject selector;
+	private GameObject _selector;
 
-	Item[] hotbar;
-	int currentSelection = 1; // Number between 1 and 9
+	private Item[] _hotbar;
+	private int _currentSelection = 1; // Number between 1 and 9
 
-	const int RANGE = 5;
+	private const int RANGE = 5;
 
-	bool isHotbarInit = false;
+	// ReSharper disable once RedundantDefaultMemberInitializer
+	private bool _isHotbarInit = false;
 
 	// Use this for initialization
-	void Start()
+	private void Start()
 	{
 		speed = 0.75f;
 
-		rb = this.gameObject.GetComponent<Rigidbody>();
+		_rb = gameObject.GetComponent<Rigidbody>();
 
-		boxColl = this.gameObject.GetComponent<BoxCollider>();
+		_boxColl = gameObject.GetComponent<BoxCollider>();
 
-		cameraObject = this.transform.Find("Camera").gameObject;
-		cam = cameraObject.GetComponent<Camera>();
+		_cameraObject = transform.Find("Camera").gameObject;
+		_cam = _cameraObject.GetComponent<Camera>();
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
 
 		// Initialize hotbar
-		hotbar = new Item[9];
-		for (int i = 0; i < hotbar.Length; i++)
+		_hotbar = new Item[9];
+		for (int i = 0; i < _hotbar.Length; i++)
 		{
-			hotbar[i] = new Item();
+			_hotbar[i] = new Item();
 		}
 
 		if (Game.hasStarted)
 		{
-			hotbar[0] = Game.register.GetItem(0);
-			hotbar[1] = Game.register.GetItem(1);
-			hotbar[2] = Game.register.GetItem(2);
-			hotbar[3] = Game.register.GetItem(3);
-			hotbar[4] = Game.register.GetItem(4);
-			hotbar[5] = Game.register.GetItem(5);
-			hotbar[6] = Game.register.GetItem(6);
-			hotbar[7] = Game.register.GetItem(7);
-			hotbar[8] = Game.register.GetItem(8);
-			isHotbarInit = true;
+			_hotbar[0] = Game.register.GetItem(0);
+			_hotbar[1] = Game.register.GetItem(1);
+			_hotbar[2] = Game.register.GetItem(2);
+			_hotbar[3] = Game.register.GetItem(3);
+			_hotbar[4] = Game.register.GetItem(4);
+			_hotbar[5] = Game.register.GetItem(5);
+			_hotbar[6] = Game.register.GetItem(6);
+			_hotbar[7] = Game.register.GetItem(7);
+			_hotbar[8] = Game.register.GetItem(8);
+			_isHotbarInit = true;
 		}
 
-		selector = GameObject.Find("Selector");
+		_selector = GameObject.Find("Selector");
 	}
 
 	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
-		if (Game.hasStarted && !isHotbarInit)
+		if (Game.hasStarted && !_isHotbarInit)
 		{
-			hotbar[0] = Game.register.GetItem(0);
-			hotbar[1] = Game.register.GetItem(1);
-			hotbar[2] = Game.register.GetItem(2);
-			hotbar[3] = Game.register.GetItem(3);
-			hotbar[4] = Game.register.GetItem(4);
-			hotbar[5] = Game.register.GetItem(5);
-			hotbar[6] = Game.register.GetItem(6);
-			hotbar[7] = Game.register.GetItem(7);
-			hotbar[8] = Game.register.GetItem(8);
-			isHotbarInit = true;
+			_hotbar[0] = Game.register.GetItem(0);
+			_hotbar[1] = Game.register.GetItem(1);
+			_hotbar[2] = Game.register.GetItem(2);
+			_hotbar[3] = Game.register.GetItem(3);
+			_hotbar[4] = Game.register.GetItem(4);
+			_hotbar[5] = Game.register.GetItem(5);
+			_hotbar[6] = Game.register.GetItem(6);
+			_hotbar[7] = Game.register.GetItem(7);
+			_hotbar[8] = Game.register.GetItem(8);
+			_isHotbarInit = true;
 		}
 
 		UpdateVision();
@@ -96,34 +96,34 @@ public class PlayerController : MonoBehaviour
 		}
 		else if (Input.GetMouseButtonDown(1))
 		{
-			Debug.Log(currentSelection);
-			if (hotbar[currentSelection - 1].type == ItemType.Block)
+			Debug.Log(_currentSelection);
+			if (_hotbar[_currentSelection - 1].type == ItemType.Block)
 			{
-				PlaceBlock(hotbar[currentSelection - 1].block);
+				PlaceBlock(_hotbar[_currentSelection - 1].block);
 			}
 		}
 
 		// Select block
 		if (Input.mouseScrollDelta.y > 0) // Right
 		{
-			if (currentSelection == 9)
+			if (_currentSelection == 9)
 			{
-				currentSelection = 1;
+				_currentSelection = 1;
 			}
 			else
 			{
-				currentSelection++;
+				_currentSelection++;
 			}
 		}
 		else if (Input.mouseScrollDelta.y < 0)
 		{
-			if (currentSelection == 1)
+			if (_currentSelection == 1)
 			{
-				currentSelection = 9;
+				_currentSelection = 9;
 			}
 			else
 			{
-				currentSelection--;
+				_currentSelection--;
 			}
 		}
 
@@ -133,11 +133,11 @@ public class PlayerController : MonoBehaviour
 	/// <summary>
 	/// Updates the player's vision.
 	/// </summary>
-	void UpdateVision()
+	private void UpdateVision()
 	{
 
-		Vector3 currentCamPos = cameraObject.transform.rotation.eulerAngles;
-		Vector3 currentPlayerPos = this.transform.rotation.eulerAngles;
+		Vector3 currentCamPos = _cameraObject.transform.rotation.eulerAngles;
+		Vector3 currentPlayerPos = transform.rotation.eulerAngles;
 		Vector3 newCamPos = currentCamPos;
 		Vector3 newPlayerPos = currentPlayerPos;
 
@@ -151,16 +151,16 @@ public class PlayerController : MonoBehaviour
 			newCamPos.x = currentCamPos.x;
 		}
 
-		cameraObject.transform.rotation = Quaternion.Euler(newCamPos);
+		_cameraObject.transform.rotation = Quaternion.Euler(newCamPos);
 
-		this.transform.rotation = Quaternion.Euler(newPlayerPos);
+		transform.rotation = Quaternion.Euler(newPlayerPos);
 
 		transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
 
-		if (cameraObject.transform.rotation.eulerAngles.x > 80 && cameraObject.transform.rotation.eulerAngles.x < 100)
+		if (_cameraObject.transform.rotation.eulerAngles.x > 80 && _cameraObject.transform.rotation.eulerAngles.x < 100)
 		{
 			Debug.LogWarning("STUCK PREVENTION ACTIVE!!!");
-			cameraObject.transform.rotation = new Quaternion(0, 0, 0, 0);
+			_cameraObject.transform.rotation = new Quaternion(0, 0, 0, 0);
 		}
 
 		// TODO: Add stuck prevention for going very fast upwards
@@ -169,7 +169,7 @@ public class PlayerController : MonoBehaviour
 	/// <summary>
 	/// Updates the player's position.
 	/// </summary>
-	void UpdatePosition()
+	private void UpdatePosition()
 	{
 
 		// FIXME: Jumping in a certain way can cause fast upward movement/double jumping
@@ -179,10 +179,10 @@ public class PlayerController : MonoBehaviour
 		if (Input.GetKey("w"))
 		{
 			//transform.position += (transform.forward/8)*speed;
-			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.forward / 8) * speed)); // Gets point on bounding box that is closest to the new position
+			closestBound = _boxColl.bounds.ClosestPoint(transform.position + ((transform.forward / 8) * speed)); // Gets point on bounding box that is closest to the new position
 			closestBound += ((transform.forward / 1000) * speed); // Add the moving Vector to the closest point on the bounding box
 
-			if (!Physics.Raycast(this.transform.position, this.transform.forward, 0.5f))
+			if (!Physics.Raycast(transform.position, transform.forward, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -193,10 +193,10 @@ public class PlayerController : MonoBehaviour
 		{
 			//transform.position += ((-transform.forward)/15)*speed;
 
-			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.forward / 18) * speed));
+			closestBound = _boxColl.bounds.ClosestPoint(transform.position + ((-transform.forward / 18) * speed));
 			closestBound += ((-transform.forward / 1000) * speed);
 
-			if (!Physics.Raycast(this.transform.position, -this.transform.forward, 0.5f))
+			if (!Physics.Raycast(transform.position, -transform.forward, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -206,10 +206,10 @@ public class PlayerController : MonoBehaviour
 		{
 			//transform.position += ((-transform.right)/10)*speed;
 
-			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((-transform.right / 10) * speed));
+			closestBound = _boxColl.bounds.ClosestPoint(transform.position + ((-transform.right / 10) * speed));
 			closestBound += ((-transform.right / 1000) * speed);
 
-			if (!Physics.Raycast(this.transform.position, -this.transform.right, 0.5f))
+			if (!Physics.Raycast(transform.position, -transform.right, 0.5f))
 			{
 				transform.position = closestBound;
 			}
@@ -219,29 +219,29 @@ public class PlayerController : MonoBehaviour
 		{
 			//transform.position += (transform.right/10)*speed;
 
-			closestBound = boxColl.bounds.ClosestPoint(this.transform.position + ((transform.right / 10) * speed));
-			closestBound += ((transform.right / 1000) * speed);
+			closestBound = _boxColl.bounds.ClosestPoint(transform.position + transform.right / 10 * speed);
+			closestBound += transform.right / 1000 * speed;
 
-			if (!Physics.Raycast(this.transform.position, this.transform.right, 0.5f))
+			if (!Physics.Raycast(transform.position, transform.right, 0.5f))
 			{
 				transform.position = closestBound;
 			}
 		}
 
-		if (Input.GetKey("space") && Physics.Raycast(this.transform.position, -transform.up, 0.1f))
+		if (Input.GetKey("space") && Physics.Raycast(transform.position, -transform.up, 0.1f))
 		{
-			rb.AddForceAtPosition(transform.up * 500, -transform.up);
+			_rb.AddForceAtPosition(transform.up * 500, -transform.up);
 		}
 
 	}
 
-	void BreakBlock(Block block) {
+	private void BreakBlock(Block block) {
 		block.Break();
 		block.chunk.RemoveBlock(block);
 	}
 
-	Block PlaceBlock(Block blockProto) {
-		BlockFace side = BlockFace.All;
+	private Block PlaceBlock(Block blockProto) {
+		BlockFace side;
 		Block block = GetBlockFromLookVector(out side);
 
 		if (side == BlockFace.All || block == null)
@@ -270,6 +270,10 @@ public class PlayerController : MonoBehaviour
 			case BlockFace.Right:
 				newPosition.x += 1;
 				break;
+			case BlockFace.All:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
 		}
 
 		Vector3 center = newPosition.ToVector3();
@@ -277,22 +281,18 @@ public class PlayerController : MonoBehaviour
 		center.y += 0.5f;
 		center.z += 0.5f;
 
-		if (Physics.OverlapBox(center, new Vector3(0.4f, 0.4f, 0.4f)).Length == 0)
-		{
-			return block.chunk.AddBlock(blockProto, newPosition); // This is going to change
-		}
-
-		return null;
+		return Physics.OverlapBox(center, new Vector3(0.4f, 0.4f, 0.4f)).Length == 0 ? 
+			block.chunk.AddBlock(blockProto, newPosition) : null;
 	}
 
 	/// <summary>
 	/// Gets the block from camera's look vector.
 	/// </summary>
 	/// <returns>The block from look vector</returns>
-	Block GetBlockFromLookVector(out BlockFace side)
+	private Block GetBlockFromLookVector(out BlockFace side)
 	{
 		RaycastHit hit;
-		Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, RANGE);
+		Physics.Raycast(_cam.transform.position, _cam.transform.forward, out hit, RANGE);
 
 
 		if (hit.transform == null)
@@ -301,7 +301,7 @@ public class PlayerController : MonoBehaviour
 			return null;
 		}
 
-		if (hit.transform.tag == "Block")
+		if (hit.transform.CompareTag("Block"))
 		{
 			Chunk chunk = hit.transform.gameObject.GetComponent<Chunk>();
 
@@ -346,7 +346,7 @@ public class PlayerController : MonoBehaviour
 		return null;
 	}
 
-	Block GetBlockFromLookVector() {
+	private Block GetBlockFromLookVector() {
 		BlockFace temp;
 		return GetBlockFromLookVector(out temp);
 	}
@@ -355,13 +355,13 @@ public class PlayerController : MonoBehaviour
 	/// Selects the block that the player is looking at
 	/// </summary>
 	/// <returns>The block.</returns>
-	Block SelectBlock() {
+	private Block SelectBlock() {
 		Block block = GetBlockFromLookVector();
 
 		if (block != null)
 		{
 
-			if (selector == null)
+			if (_selector == null)
 			{
 				if (selectorPrefab == null)
 				{
@@ -369,29 +369,30 @@ public class PlayerController : MonoBehaviour
 				}
 				else
 				{
-					selector = Instantiate(selectorPrefab);
-					selector.name = "Selector";
+					_selector = Instantiate(selectorPrefab);
+					_selector.name = "Selector";
 				}
 			}
 
 			RVector3 pos = block.position;
 			pos += block.chunk.Position;
-			pos.y = block.position.y;	
-			
-			selector.SetActive(true);
-			selector.transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
+			pos.y = block.position.y;
+
+			if (_selector == null) throw new NullReferenceException("Selector has not been initialized!");
+			_selector.SetActive(true);
+			_selector.transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
 
 			return block;
 		}
 
-		if (selector != null)
+		if (_selector != null)
 		{
-			selector.SetActive(false);
+			_selector.SetActive(false);
 		}
 		return null;
 	}
-		
-	BlockFace GetBlockSide(RaycastHit hit) {
+
+	private BlockFace GetBlockSide(RaycastHit hit) {
 		BlockFace face = BlockFace.All;
 
 		Vector3 normal = hit.normal;

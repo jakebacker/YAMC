@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 public class Item
 {
     public ItemType type = ItemType.Item;

@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public interface Mod {
+﻿
+public interface IMod {
 
 	void PreInit();
 
