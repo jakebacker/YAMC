@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
 	public GameObject selectorPrefab;
 	GameObject selector;
 
-	Block[] hotbar;
+	Item[] hotbar;
 	int currentSelection = 1; // Number between 1 and 9
 
 	const int RANGE = 5;
@@ -40,23 +40,23 @@ public class PlayerController : MonoBehaviour
 		Cursor.visible = false;
 
 		// Initialize hotbar
-		hotbar = new Block[9];
+		hotbar = new Item[9];
 		for (int i = 0; i < hotbar.Length; i++)
 		{
-			hotbar[i] = new Block(true);
+			hotbar[i] = new Item();
 		}
 
 		if (Game.hasStarted)
 		{
-			hotbar[0] = (Block)Game.register.GetBlock(0);
-			hotbar[1] = (Block)Game.register.GetBlock(1);
-			hotbar[2] = (Block)Game.register.GetBlock(2);
-			hotbar[3] = (Block)Game.register.GetBlock(3);
-			hotbar[4] = (Block)Game.register.GetBlock(4);
-			hotbar[5] = (Block)Game.register.GetBlock(5);
-			hotbar[6] = (Block)Game.register.GetBlock(6);
-			hotbar[7] = (Block)Game.register.GetBlock(7);
-			hotbar[8] = (Block)Game.register.GetBlock(8);
+			hotbar[0] = Game.register.GetItem(0);
+			hotbar[1] = Game.register.GetItem(1);
+			hotbar[2] = Game.register.GetItem(2);
+			hotbar[3] = Game.register.GetItem(3);
+			hotbar[4] = Game.register.GetItem(4);
+			hotbar[5] = Game.register.GetItem(5);
+			hotbar[6] = Game.register.GetItem(6);
+			hotbar[7] = Game.register.GetItem(7);
+			hotbar[8] = Game.register.GetItem(8);
 			isHotbarInit = true;
 		}
 
@@ -68,15 +68,15 @@ public class PlayerController : MonoBehaviour
 	{
 		if (Game.hasStarted && !isHotbarInit)
 		{
-			hotbar[0] = (Block)Game.register.GetBlock(0);
-			hotbar[1] = (Block)Game.register.GetBlock(1);
-			hotbar[2] = (Block)Game.register.GetBlock(2);
-			hotbar[3] = (Block)Game.register.GetBlock(3);
-			hotbar[4] = (Block)Game.register.GetBlock(4);
-			hotbar[5] = (Block)Game.register.GetBlock(5);
-			hotbar[6] = (Block)Game.register.GetBlock(6);
-			hotbar[7] = (Block)Game.register.GetBlock(7);
-			hotbar[8] = (Block)Game.register.GetBlock(8);
+			hotbar[0] = Game.register.GetItem(0);
+			hotbar[1] = Game.register.GetItem(1);
+			hotbar[2] = Game.register.GetItem(2);
+			hotbar[3] = Game.register.GetItem(3);
+			hotbar[4] = Game.register.GetItem(4);
+			hotbar[5] = Game.register.GetItem(5);
+			hotbar[6] = Game.register.GetItem(6);
+			hotbar[7] = Game.register.GetItem(7);
+			hotbar[8] = Game.register.GetItem(8);
 			isHotbarInit = true;
 		}
 
@@ -97,7 +97,10 @@ public class PlayerController : MonoBehaviour
 		else if (Input.GetMouseButtonDown(1))
 		{
 			Debug.Log(currentSelection);
-			PlaceBlock(hotbar[currentSelection-1]);	
+			if (hotbar[currentSelection - 1].type == ItemType.Block)
+			{
+				PlaceBlock(hotbar[currentSelection - 1].block);
+			}
 		}
 
 		// Select block

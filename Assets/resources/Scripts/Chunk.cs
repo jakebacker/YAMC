@@ -92,11 +92,11 @@ public class Chunk : MonoBehaviour
 
 						if (y == (int)Mathf.Floor(chunkHeights[x, z]))
 						{
-							chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(0)); // Grass
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(0)); // Grass
 						}
 						else if (y >= chunkHeights[x, z] - 5)
 						{
-							chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1)); // Dirt
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
 						}
 						else
 						{
@@ -110,12 +110,12 @@ public class Chunk : MonoBehaviour
 							noise -= (float)Math.Truncate(noise);
 							if (noise < 0.5)
 							{
-								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(2)); // Stone
+								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)); // Stone
 								chunkBlocks[x, y, z].miningLevel = 1;
 							}
 							else
 							{
-								chunkBlocks[x, y, z] = new Block((Block)Game.register.GetItem(1)); // Dirt
+								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
 							}
 
 						}
@@ -345,7 +345,6 @@ public class Chunk : MonoBehaviour
 		rpos.x -= chunkPosition.x;
 		rpos.z -= chunkPosition.z;
 		
-		Debug.Log("Get Block at: " + rpos.ToString());
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
 	}
 

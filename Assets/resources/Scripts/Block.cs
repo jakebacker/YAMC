@@ -10,7 +10,7 @@ public enum BlockFace {
 	Near //Z-
 }
 
-public class Block : Item
+public class Block
 {
 	public RVector3 position;
 
@@ -19,6 +19,8 @@ public class Block : Item
 	public bool empty = false;
 
 	public byte id;
+
+	public Item item;
 
 	/*
 	 * Mining Levels:
@@ -40,6 +42,7 @@ public class Block : Item
 	public Block(Block block) {
 		id = block.id;
 		miningLevel = block.miningLevel;
+		item = block.item;
 	}
 
 	public virtual void Break() {
