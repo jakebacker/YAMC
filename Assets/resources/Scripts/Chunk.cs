@@ -1,17 +1,20 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
-[System.Serializable]
+[Serializable]
 public class Chunk : MonoBehaviour
 {
-	Mesh chunkMesh;
-	MeshCollider chunkCollider;
+	private Mesh _chunkMesh;
+	private MeshCollider _chunkCollider;
 
-	Bounds bounds;
+#pragma warning disable 649
+	private Bounds _bounds;
+#pragma warning restore 649
 
-	RVector3 chunkPosition;
-	public RVector3 Position{ get{ return chunkPosition;} set{ chunkPosition = value;}}
+	private RVector3 _chunkPosition;
+	public RVector3 Position{ get{ return _chunkPosition;} set{ _chunkPosition = value;}}
 
 	public RVector3 chunkSize;
 	public RVector3 Size{ get{ return chunkSize;} set{chunkSize = value;}}
@@ -24,31 +27,54 @@ public class Chunk : MonoBehaviour
 	public int seed;
 	public int intensity;
 
-	List<Vector3> chunkVerticies = new List<Vector3>();
-	List<Vector2> chunkUV = new List<Vector2>();
-	List<int> chunkTriangles = new List<int>();
-	int VerticiesIndex;
+	private List<Vector3> _chunkVerticies = new List<Vector3>();
+	private List<Vector2> _chunkUv = new List<Vector2>();
+	private List<int> _chunkTriangles = new List<int>();
+	private int _verticiesIndex;
 
 	public Vector2 textureBlockSize;
-	Texture textureAtlas;
-	Vector2 atlasSize;
+	private Texture _textureAtlas;
+	private Vector2 _atlasSize;
 
-	void Awake () {
-		textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
-		atlasSize = new Vector2(textureAtlas.width / textureBlockSize.x, textureAtlas.height / textureBlockSize.y);
+	private bool _hasGenerated;
 
-		chunkMesh = this.GetComponent<MeshFilter>().mesh;
-		chunkMesh.MarkDynamic();
+	private void Start ()
+	{
 
-		GenerateChunk();
-		chunkCollider = this.GetComponent<MeshCollider>();
+		_chunkPosition = new RVector3(transform.position);
+		_textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
+		_atlasSize = new Vector2(_textureAtlas.width / textureBlockSize.x, _textureAtlas.height / textureBlockSize.y);
 
-		bounds.SetMinMax(this.transform.position, this.transform.position+chunkSize);
+		_chunkMesh = GetComponent<MeshFilter>().mesh;
+		_chunkMesh.MarkDynamic();
+
+		if (seed < 0)
+		{
+			seed = Random.Range(0, (int)Mathf.Round(Util.maxInt/500.0f));
+		}
+
+		if (Game.hasStarted)
+		{
+			GenerateChunk();
+			_chunkCollider = GetComponent<MeshCollider>();
+
+			_bounds.SetMinMax(transform.position, transform.position + chunkSize);
+		}
+	}
+
+	private void Update() {
+		if (Game.hasStarted && !_hasGenerated)
+		{
+			GenerateChunk();
+			_chunkCollider = GetComponent<MeshCollider>();
+
+			_bounds.SetMinMax(transform.position, transform.position + chunkSize);
+		}
 	}
 
 	public void GenerateChunk() {
 
-		float[,] chunkHeights = Noise.Generate(chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
+		float[,] chunkHeights = Noise.Generate(new RVector3(transform.position), chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
 
 		chunkBlocks = new Block[chunkSize.x + 1, chunkSize.y + 1, chunkSize.z + 1];
 
@@ -58,52 +84,56 @@ public class Chunk : MonoBehaviour
 			{
 				for (int y = 0; y <= chunkSize.y; y++)
 				{
-					chunkBlocks[x, y, z] = new Block(true);
-					chunkBlocks[x, y, z].position = new RVector3(x, y, z);
+					chunkBlocks[x, y, z] = new Block(true) {position = new RVector3(x, y, z)};
 
-					if (y <= chunkHeights[x, z])
+					if (!(y <= chunkHeights[x, z])) continue;
+					chunkBlocks[x, y, z] = new Block(false);
+
+					if (y == (int)Mathf.Floor(chunkHeights[x, z]))
 					{
-						chunkBlocks[x, y, z] = new Block(false);
-						chunkBlocks[x, y, z].position = new RVector3(x, y, z);
-						chunkBlocks[x, y, z].chunk = this;
-
-						if (y == Mathf.Floor(chunkHeights[x, z]))
+						chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(0)); // Grass
+					}
+					else if (y >= chunkHeights[x, z] - 5)
+					{
+						chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
+					}
+					else
+					{
+						//int tempSeed = (int)Mathf.Floor(seed/2*3);
+							
+						/*Debug.Log("X: " + x);
+							Debug.Log("Y: " + y);
+							Debug.Log("Seed: " + seed);
+							Debug.Log("Noise: " + Mathf.PerlinNoise(seed + x + 0.1f, seed + y + 0.1f));*/
+						float noise = Mathf.PerlinNoise(seed + x, seed + y);
+						noise -= (float)Math.Truncate(noise);
+						if (noise < 0.5)
 						{
-							chunkBlocks[x, y, z].id = 0; // Grass
-						}
-						else if (y >= chunkHeights[x, z] - 5)
-						{
-							chunkBlocks[x, y, z].id = 1; // Dirt
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)) {miningLevel = 1}; // Stone
 						}
 						else
 						{
-							int tempSeed = (int)Mathf.Floor(seed/2*3);
-							if (Mathf.PerlinNoise(tempSeed + x, tempSeed + y) < 0.7)
-							{
-								chunkBlocks[x, y, z].id = 2; // Stone
-								chunkBlocks[x, y, z].miningLevel = 1;
-							}
-							else
-							{
-								chunkBlocks[x, y, z].id = 1;
-							}
-
+							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
 						}
 
 					}
+						
+					chunkBlocks[x, y, z].position = new RVector3(x, y, z);
+					chunkBlocks[x, y, z].chunk = this;
 				}
 			}
 		}
 
+		_hasGenerated = true;
 		UpdateChunk();
 	}
 
 	public void UpdateChunk() {
-		chunkVerticies = new List<Vector3>();
-		chunkUV = new List<Vector2>();
-		chunkTriangles = new List<int>();
+		_chunkVerticies = new List<Vector3>();
+		_chunkUv = new List<Vector2>();
+		_chunkTriangles = new List<int>();
 
-		chunkMesh.Clear();
+		_chunkMesh.Clear();
 
 		float blockSize = 1;
 
@@ -113,84 +143,76 @@ public class Chunk : MonoBehaviour
 			{
 				for (int z = 0; z <= chunkSize.z; z++)
 				{
-					if (!chunkBlocks[x, y, z].empty)
+					if (chunkBlocks[x, y, z].empty) continue;
+					if (CheckSides(new RVector3(x, y, z), BlockFace.Top))
 					{
-						if (CheckSides(new RVector3(x, y, z), BlockFace.Top))
-						{
-							VerticiesIndex = chunkVerticies.Count;
+						_verticiesIndex = _chunkVerticies.Count;
 
-							chunkVerticies.Add(new Vector3(x, y + blockSize, z));
-							chunkVerticies.Add(new Vector3(x, y + blockSize, z + blockSize));
-							chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z + blockSize));
-							chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
+						_chunkVerticies.Add(new Vector3(x, y + blockSize, z));
+						_chunkVerticies.Add(new Vector3(x, y + blockSize, z + blockSize));
+						_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z + blockSize));
+						_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
 
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Bottom))
-						{
-							VerticiesIndex = chunkVerticies.Count;
-
-							chunkVerticies.Add(new Vector3(x,y,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-							chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
-
-
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Right))
-						{
-							VerticiesIndex = chunkVerticies.Count;
-
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Left))
-						{
-							VerticiesIndex = chunkVerticies.Count;
-
-							chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-							chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
-							chunkVerticies.Add(new Vector3(x,y+blockSize,z));
-							chunkVerticies.Add(new Vector3(x,y,z));
-
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Far))
-						{
-							VerticiesIndex = chunkVerticies.Count;
-
-							chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
-							chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
-
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Near))
-						{
-							VerticiesIndex = chunkVerticies.Count;
-
-							chunkVerticies.Add(new Vector3(x,y,z));
-							chunkVerticies.Add(new Vector3(x,y+blockSize,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
-							chunkVerticies.Add(new Vector3(x+blockSize,y,z));
-
-							UpdateChunkUV(chunkBlocks[x,y,z].id);
-						}
-
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
 					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Bottom))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Right))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Left))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
+						_chunkVerticies.Add(new Vector3(x,y,z));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Far))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if (!CheckSides(new RVector3(x, y, z), BlockFace.Near)) continue;
+					_verticiesIndex = _chunkVerticies.Count;
+
+					_chunkVerticies.Add(new Vector3(x,y,z));
+					_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
+					_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
+					_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+
+					UpdateChunkUv(chunkBlocks[x,y,z].id);
 				}
 			}
 		}
@@ -199,17 +221,16 @@ public class Chunk : MonoBehaviour
 
 	// TODO: Clean up
 	public bool CheckSides(RVector3 blockPosition, BlockFace blockFace) {
-		int x, y, z;
-		x = blockPosition.x;
-		y = blockPosition.y;
-		z = blockPosition.z;
+		int x = blockPosition.x;
+		int y = blockPosition.y;
+		int z = blockPosition.z;
 
 		switch (blockFace)
 		{
 			case BlockFace.Top:
 				if (y + 1 <= chunkSize.y)
 				{
-					if (!chunkBlocks[x, y + 1, z].empty)
+					if (!chunkBlocks[x, y + 1, z].empty && !chunkBlocks[x, y + 1, z].hasTransparency)
 					{
 						return false;
 					}
@@ -218,7 +239,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Bottom:
 				if (y - 1 >= 0)
 				{
-					if (!chunkBlocks[x, y - 1, z].empty)
+					if (!chunkBlocks[x, y - 1, z].empty && !chunkBlocks[x, y - 1, z].hasTransparency)
 					{
 						return false;
 					}
@@ -227,7 +248,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Right:
 				if (x + 1 <= chunkSize.x)
 				{
-					if (!chunkBlocks[x + 1, y, z].empty)
+					if (!chunkBlocks[x + 1, y, z].empty && !chunkBlocks[x + 1, y, z].hasTransparency)
 					{
 						return false;
 					}
@@ -236,7 +257,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Left:
 				if (x - 1 >= 0)
 				{
-					if (!chunkBlocks[x - 1, y, z].empty)
+					if (!chunkBlocks[x - 1, y, z].empty && !chunkBlocks[x - 1, y, z].hasTransparency)
 					{
 						return false;
 					}
@@ -245,7 +266,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Far:
 				if (z + 1 <= chunkSize.z)
 				{
-					if (!chunkBlocks[x, y, z + 1].empty)
+					if (!chunkBlocks[x, y, z + 1].empty && !chunkBlocks[x, y, z + 1].hasTransparency)
 					{
 						return false;
 					}
@@ -254,49 +275,54 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Near:
 				if (z - 1 >= 0)
 				{
-					if (!chunkBlocks[x, y, z - 1].empty)
+					if (!chunkBlocks[x, y, z - 1].empty && !chunkBlocks[x, y, z - 1].hasTransparency)
 					{
 						return false;
 					}
 				}
 				break;
+			case BlockFace.All:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException("blockFace", blockFace, null);
 		}
 		return true;
-	} 
-
-	void UpdateChunkUV(byte blockID) {
-		chunkTriangles.Add(VerticiesIndex);
-		chunkTriangles.Add(VerticiesIndex + 1);
-		chunkTriangles.Add(VerticiesIndex + 2);
-
-		chunkTriangles.Add(VerticiesIndex + 2);
-		chunkTriangles.Add(VerticiesIndex + 3);
-		chunkTriangles.Add(VerticiesIndex);
-
-		Vector2 textureInterval = new Vector2(1 / atlasSize.x, 1 / atlasSize.y);
-
-		Vector2 textureID = new Vector2(textureInterval.x * (blockID % atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockID / atlasSize.y));
-
-		chunkUV.Add(new Vector2(textureID.x,textureID.y-textureInterval.y));
-		chunkUV.Add(new Vector2(textureID.x+textureInterval.x,textureID.y-textureInterval.y));
-		chunkUV.Add(new Vector2(textureID.x+textureInterval.x,textureID.y));
-		chunkUV.Add(new Vector2(textureID.x,textureID.y));
 	}
 
-	void UpdateCollider() {
-		chunkCollider.enabled = false;
-		chunkCollider.enabled = true;
+	private void UpdateChunkUv(byte blockId) {
+		_chunkTriangles.Add(_verticiesIndex);
+		_chunkTriangles.Add(_verticiesIndex + 1);
+		_chunkTriangles.Add(_verticiesIndex + 2);
+
+		_chunkTriangles.Add(_verticiesIndex + 2);
+		_chunkTriangles.Add(_verticiesIndex + 3);
+		_chunkTriangles.Add(_verticiesIndex);
+
+		Vector2 textureInterval = new Vector2(1 / _atlasSize.x, 1 / _atlasSize.y);
+
+		Vector2 textureId = new Vector2(textureInterval.x * (blockId % _atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockId / _atlasSize.y));
+
+		
+		_chunkUv.Add(new Vector2(textureId.x,textureId.y-textureInterval.y));
+		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y-textureInterval.y));
+		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y));
+		_chunkUv.Add(new Vector2(textureId.x,textureId.y));
 	}
 
-	void FinalizeChunk() {
-		chunkMesh.vertices = chunkVerticies.ToArray();
-		chunkMesh.triangles = chunkTriangles.ToArray();
-		chunkMesh.uv = chunkUV.ToArray();
-		chunkMesh.RecalculateNormals();
+	private void UpdateCollider() {
+		_chunkCollider.enabled = false;
+		_chunkCollider.enabled = true;
+	}
 
-		if (this.gameObject.GetComponent<MeshCollider>() == null)
+	private void FinalizeChunk() {
+		_chunkMesh.vertices = _chunkVerticies.ToArray();
+		_chunkMesh.triangles = _chunkTriangles.ToArray();
+		_chunkMesh.uv = _chunkUv.ToArray();
+		_chunkMesh.RecalculateNormals();
+
+		if (gameObject.GetComponent<MeshCollider>() == null)
 		{
-			this.gameObject.AddComponent<MeshCollider>();
+			gameObject.AddComponent<MeshCollider>();
 		}
 	}
 
@@ -308,6 +334,9 @@ public class Chunk : MonoBehaviour
 	public Block GetBlock(Vector3 position) {
 		RVector3 rpos = new RVector3(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y), Mathf.FloorToInt(position.z));
 
+		rpos.x -= _chunkPosition.x;
+		rpos.z -= _chunkPosition.z;
+		
 		return chunkBlocks[rpos.x, rpos.y, rpos.z];
 	}
 
@@ -319,13 +348,14 @@ public class Chunk : MonoBehaviour
 		UpdateCollider();
 	}
 
-	public Block AddBlock(byte id, RVector3 position) {
-		if (bounds.Contains(position.ToVector3()))
+	public Block AddBlock(Block blockProto, RVector3 position) {
+		if (_bounds.Contains(position.ToVector3()))
 		{
-			Block block = new Block(false);
-			block.id = id;
-			block.position = position;
-			block.chunk = this;
+			Block block = new Block(blockProto)
+			{
+				position = position,
+				chunk = this
+			};
 			chunkBlocks[position.x, position.y, position.z] = block;
 
 			UpdateChunk();
