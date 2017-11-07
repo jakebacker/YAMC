@@ -1,6 +1,4 @@
-﻿using System;
-
-public enum BlockFace {
+﻿public enum BlockFace {
 	All,
 	Top, //Y+
 	Bottom, //Y-
@@ -10,15 +8,16 @@ public enum BlockFace {
 	Near //Z-
 }
 
-public class Block
-{
+public class Block {
 	public RVector3 position;
 
 	public Chunk chunk;
 
-	public bool empty = false;
+	public bool empty;
 
-	public byte id = 0;
+	public byte id;
+
+	public Item item;
 
 	/*
 	 * Mining Levels:
@@ -28,16 +27,25 @@ public class Block
 	 * 3: Iron
 	 * 4: Diamond
 	 */
-	public byte miningLevel = 0;
+	public byte miningLevel;
 
-	public Block ReturnBlock {get{return this;}}
+	public bool hasTransparency = false;
 
-	public Block(bool isEmpty)
-	{
-		empty = isEmpty; 
+	public Block ReturnBlock {
+		get { return this; }
 	}
 
-	public void Break() {
-		// This is run when the block is broken
+	public Block(bool isEmpty) {
+		empty = isEmpty;
+	}
+
+	public Block(Block block) {
+		id = block.id;
+		miningLevel = block.miningLevel;
+		item = block.item;
+		hasTransparency = block.hasTransparency;
+	}
+
+	public virtual void Break() {
 	}
 }

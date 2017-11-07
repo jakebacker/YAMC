@@ -1,20 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public struct Noise{
 
-	public static float[,] Generate(int xSize, int ySize, int seed, float intensity) {
+	public static float[,] Generate(RVector3 chunkPosition, int xSize, int ySize, int seed, float intensity, int minHeight=50) {
 		float[,] noise = new float[xSize, ySize];
 
-		for (int x = 0; x < xSize; x++)
+		for (int x = chunkPosition.x; x < xSize+chunkPosition.x; x++)
 		{
-			for (int y = 0; y < ySize; y++)
+			for (int y = chunkPosition.z; y < ySize+chunkPosition.z; y++)
 			{
 				float xNoise = (float)x / xSize * intensity;
 				float yNoise = (float)y / ySize * intensity;
 
-				noise[x, y] = Mathf.PerlinNoise(seed + xNoise, seed + yNoise) * intensity;
+				noise[x-chunkPosition.x, y-chunkPosition.z] = Mathf.PerlinNoise(seed + xNoise, seed + yNoise) * intensity+minHeight;
 			}
 		}
 		return noise;
