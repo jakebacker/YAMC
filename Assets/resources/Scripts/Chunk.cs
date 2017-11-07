@@ -143,81 +143,76 @@ public class Chunk : MonoBehaviour
 			{
 				for (int z = 0; z <= chunkSize.z; z++)
 				{
-					if (!chunkBlocks[x, y, z].empty)
+					if (chunkBlocks[x, y, z].empty) continue;
+					if (CheckSides(new RVector3(x, y, z), BlockFace.Top))
 					{
-						if (CheckSides(new RVector3(x, y, z), BlockFace.Top))
-						{
-							_verticiesIndex = _chunkVerticies.Count;
-
-							_chunkVerticies.Add(new Vector3(x, y + blockSize, z));
-							_chunkVerticies.Add(new Vector3(x, y + blockSize, z + blockSize));
-							_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z + blockSize));
-							_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
-
-							UpdateChunkUv(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Bottom))
-						{
-							_verticiesIndex = _chunkVerticies.Count;
-
-							_chunkVerticies.Add(new Vector3(x,y,z));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-
-							UpdateChunkUv(chunkBlocks[x,y,z].id);
-						}
-
-
-
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Right))
-						{
-							_verticiesIndex = _chunkVerticies.Count;
-
-							_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-
-							UpdateChunkUv(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Left))
-						{
-							_verticiesIndex = _chunkVerticies.Count;
-
-							_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
-							_chunkVerticies.Add(new Vector3(x,y,z));
-
-							UpdateChunkUv(chunkBlocks[x,y,z].id);
-						}
-
-						if(CheckSides(new RVector3(x,y,z),BlockFace.Far))
-						{
-							_verticiesIndex = _chunkVerticies.Count;
-
-							_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
-							_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
-
-							UpdateChunkUv(chunkBlocks[x,y,z].id);
-						}
-
-						if (!CheckSides(new RVector3(x, y, z), BlockFace.Near)) continue;
 						_verticiesIndex = _chunkVerticies.Count;
 
-						_chunkVerticies.Add(new Vector3(x,y,z));
-						_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
-						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
-						_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+						_chunkVerticies.Add(new Vector3(x, y + blockSize, z));
+						_chunkVerticies.Add(new Vector3(x, y + blockSize, z + blockSize));
+						_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z + blockSize));
+						_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
 
 						UpdateChunkUv(chunkBlocks[x,y,z].id);
 					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Bottom))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Right))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Left))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
+						_chunkVerticies.Add(new Vector3(x,y,z));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if(CheckSides(new RVector3(x,y,z),BlockFace.Far))
+					{
+						_verticiesIndex = _chunkVerticies.Count;
+
+						_chunkVerticies.Add(new Vector3(x,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z+blockSize));
+						_chunkVerticies.Add(new Vector3(x,y+blockSize,z+blockSize));
+
+						UpdateChunkUv(chunkBlocks[x,y,z].id);
+					}
+
+					if (!CheckSides(new RVector3(x, y, z), BlockFace.Near)) continue;
+					_verticiesIndex = _chunkVerticies.Count;
+
+					_chunkVerticies.Add(new Vector3(x,y,z));
+					_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
+					_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
+					_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+
+					UpdateChunkUv(chunkBlocks[x,y,z].id);
 				}
 			}
 		}
@@ -235,7 +230,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Top:
 				if (y + 1 <= chunkSize.y)
 				{
-					if (!chunkBlocks[x, y + 1, z].empty)
+					if (!chunkBlocks[x, y + 1, z].empty && !chunkBlocks[x, y + 1, z].hasTransparency)
 					{
 						return false;
 					}
@@ -244,7 +239,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Bottom:
 				if (y - 1 >= 0)
 				{
-					if (!chunkBlocks[x, y - 1, z].empty)
+					if (!chunkBlocks[x, y - 1, z].empty && !chunkBlocks[x, y - 1, z].hasTransparency)
 					{
 						return false;
 					}
@@ -253,7 +248,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Right:
 				if (x + 1 <= chunkSize.x)
 				{
-					if (!chunkBlocks[x + 1, y, z].empty)
+					if (!chunkBlocks[x + 1, y, z].empty && !chunkBlocks[x + 1, y, z].hasTransparency)
 					{
 						return false;
 					}
@@ -262,7 +257,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Left:
 				if (x - 1 >= 0)
 				{
-					if (!chunkBlocks[x - 1, y, z].empty)
+					if (!chunkBlocks[x - 1, y, z].empty && !chunkBlocks[x - 1, y, z].hasTransparency)
 					{
 						return false;
 					}
@@ -271,7 +266,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Far:
 				if (z + 1 <= chunkSize.z)
 				{
-					if (!chunkBlocks[x, y, z + 1].empty)
+					if (!chunkBlocks[x, y, z + 1].empty && !chunkBlocks[x, y, z + 1].hasTransparency)
 					{
 						return false;
 					}
@@ -280,7 +275,7 @@ public class Chunk : MonoBehaviour
 			case BlockFace.Near:
 				if (z - 1 >= 0)
 				{
-					if (!chunkBlocks[x, y, z - 1].empty)
+					if (!chunkBlocks[x, y, z - 1].empty && !chunkBlocks[x, y, z - 1].hasTransparency)
 					{
 						return false;
 					}
@@ -307,6 +302,7 @@ public class Chunk : MonoBehaviour
 
 		Vector2 textureId = new Vector2(textureInterval.x * (blockId % _atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockId / _atlasSize.y));
 
+		
 		_chunkUv.Add(new Vector2(textureId.x,textureId.y-textureInterval.y));
 		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y-textureInterval.y));
 		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y));

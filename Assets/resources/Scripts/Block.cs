@@ -1,5 +1,4 @@
-﻿
-public enum BlockFace {
+﻿public enum BlockFace {
 	All,
 	Top, //Y+
 	Bottom, //Y-
@@ -9,8 +8,7 @@ public enum BlockFace {
 	Near //Z-
 }
 
-public class Block
-{
+public class Block {
 	public RVector3 position;
 
 	public Chunk chunk;
@@ -31,17 +29,21 @@ public class Block
 	 */
 	public byte miningLevel;
 
-	public Block ReturnBlock {get{return this;}}
+	public bool hasTransparency = false;
 
-	public Block(bool isEmpty)
-	{
-		empty = isEmpty; 
+	public Block ReturnBlock {
+		get { return this; }
+	}
+
+	public Block(bool isEmpty) {
+		empty = isEmpty;
 	}
 
 	public Block(Block block) {
 		id = block.id;
 		miningLevel = block.miningLevel;
 		item = block.item;
+		hasTransparency = block.hasTransparency;
 	}
 
 	public virtual void Break() {
