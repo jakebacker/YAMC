@@ -98,16 +98,17 @@ public class Chunk : MonoBehaviour
 						chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(1)); // Dirt
 					}
 					else
-					{
+					{ // This block conatains any standard ore generation
+						
 						//int tempSeed = (int)Mathf.Floor(seed/2*3);
-							
-						/*Debug.Log("X: " + x);
-							Debug.Log("Y: " + y);
-							Debug.Log("Seed: " + seed);
-							Debug.Log("Noise: " + Mathf.PerlinNoise(seed + x + 0.1f, seed + y + 0.1f));*/
-						float noise = Mathf.PerlinNoise(seed + x, seed + y);
-						noise -= (float)Math.Truncate(noise);
-						if (noise < 0.5)
+
+						float xNoise = (x + _chunkPosition.x) / 3.0f * 0.15f;
+						float yNoise = (y + _chunkPosition.y) / 3.0f * 0.15f;
+						float zNoise = (z + _chunkPosition.z) / 3.0f * 0.15f;
+						
+						float noise = Noise.Perlin3D(seed + xNoise, seed + yNoise, seed + zNoise);
+						
+						if (noise < 0.65)
 						{
 							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)) {miningLevel = 1}; // Stone
 						}
