@@ -146,8 +146,7 @@ public class PlayerController : MonoBehaviour
 
 		// HACK: This is horrible... 80 is also a totally random number
 		// FIXME: This needs to allow looking down
-		if ((newCamPos.x > 70 && newCamPos.x < 90) || newCamPos.x < -180)
-		{
+		if ((newCamPos.x > 80 && newCamPos.x < 90) || newCamPos.x < -180) {
 			newCamPos.x = currentCamPos.x;
 		}
 
