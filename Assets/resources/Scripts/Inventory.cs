@@ -1,13 +1,14 @@
-﻿public abstract class Inventory {
-	private int _width;
-	private int _height;
+﻿using UnityEngine;
+
+public abstract class Inventory {
+	private Vector2 size;
 	
 	protected Item[,] items;
 
 	protected Inventory(int width, int height) {
-		_width = width;
-		_height = height;
+		size.x = width;
+		size.y = height;
 
-		items = new Item[_width, _height];
+		items = new Item[(int)size.x,(int)size.y];
 	}
 }

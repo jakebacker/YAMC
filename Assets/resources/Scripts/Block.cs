@@ -31,6 +31,8 @@ public class Block {
 
 	public bool hasTransparency = false;
 
+	public bool isInteractable = false;
+
 	public Block ReturnBlock {
 		get { return this; }
 	}
@@ -44,6 +46,7 @@ public class Block {
 		miningLevel = block.miningLevel;
 		item = block.item;
 		hasTransparency = block.hasTransparency;
+		isInteractable = block.isInteractable;
 	}
 
 	public virtual void Break() {
