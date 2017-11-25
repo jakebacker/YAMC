@@ -208,12 +208,12 @@ public class Chunk : MonoBehaviour
 					if (!CheckSides(new RVector3(x, y, z), BlockFace.Near)) continue;
 					_verticiesIndex = _chunkVerticies.Count;
 
-					_chunkVerticies.Add(new Vector3(x,y,z));
-					_chunkVerticies.Add(new Vector3(x,y+blockSize,z));
-					_chunkVerticies.Add(new Vector3(x+blockSize,y+blockSize,z));
-					_chunkVerticies.Add(new Vector3(x+blockSize,y,z));
+					_chunkVerticies.Add(new Vector3(x, y, z));
+					_chunkVerticies.Add(new Vector3(x, y + blockSize, z));
+					_chunkVerticies.Add(new Vector3(x + blockSize, y + blockSize, z));
+					_chunkVerticies.Add(new Vector3(x + blockSize, y, z));
 
-					UpdateChunkUv(chunkBlocks[x,y,z].id);
+					UpdateChunkUv(chunkBlocks[x, y, z].id);
 				}
 			}
 		}
