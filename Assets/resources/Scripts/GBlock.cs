@@ -58,30 +58,30 @@ public class GBlock : MonoBehaviour {
 		uvsTop = uvsFront;
 		uvsBottom = uvsFront;
 		
-		// - set UV coordinates -
+		// - set UV coordinates - All of the numbers in comments are the original/broken ones
 
-		// FRONT    2    3    0    1
-		uvs[2] = new Vector2(uvsFront.x, uvsFront.y);
-		uvs[3] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y);
-		uvs[0] = new Vector2(uvsFront.x, uvsFront.y - uvsFront.height);
-		uvs[1] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y - uvsFront.height);
+		// BACK    2    3    0    1
+		uvs[0] = new Vector2(uvsFront.x, uvsFront.y);
+		uvs[1] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y);
+		uvs[2] = new Vector2(uvsFront.x, uvsFront.y - uvsFront.height);
+		uvs[3] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y - uvsFront.height);
 
-		// BACK    6    7   10   11
+		// FRONT    6    7   10   11
 		uvs[6] = new Vector2(uvsBack.x, uvsBack.y);
 		uvs[7] = new Vector2(uvsBack.x + uvsBack.width, uvsBack.y);
 		uvs[10] = new Vector2(uvsBack.x, uvsBack.y - uvsBack.height);
 		uvs[11] = new Vector2(uvsBack.x + uvsBack.width, uvsBack.y - uvsBack.height);
 
 		// LEFT   19   17   16   18
-		uvs[19] = new Vector2(uvsLeft.x, uvsLeft.y);
-		uvs[17] = new Vector2(uvsLeft.x + uvsLeft.width, uvsLeft.y);
-		uvs[16] = new Vector2(uvsLeft.x, uvsLeft.y - uvsLeft.height);
+		uvs[16] = new Vector2(uvsLeft.x, uvsLeft.y);
+		uvs[19] = new Vector2(uvsLeft.x + uvsLeft.width, uvsLeft.y);
+		uvs[17] = new Vector2(uvsLeft.x, uvsLeft.y - uvsLeft.height);
 		uvs[18] = new Vector2(uvsLeft.x + uvsLeft.width, uvsLeft.y - uvsLeft.height);
 
 		// RIGHT   23   21   20   22
-		uvs[23] = new Vector2(uvsRight.x, uvsRight.y);
-		uvs[21] = new Vector2(uvsRight.x + uvsRight.width, uvsRight.y);
-		uvs[20] = new Vector2(uvsRight.x, uvsRight.y - uvsRight.height);
+		uvs[20] = new Vector2(uvsRight.x, uvsRight.y);
+		uvs[23] = new Vector2(uvsRight.x + uvsRight.width, uvsRight.y);
+		uvs[21] = new Vector2(uvsRight.x, uvsRight.y - uvsRight.height);
 		uvs[22] = new Vector2(uvsRight.x + uvsRight.width, uvsRight.y - uvsRight.height);
 
 		// TOP    4    5    8    9
@@ -90,10 +90,10 @@ public class GBlock : MonoBehaviour {
 		uvs[8] = new Vector2(uvsTop.x, uvsTop.y - uvsTop.height);
 		uvs[9] = new Vector2(uvsTop.x + uvsTop.width, uvsTop.y - uvsTop.height);
 
-		// BOTTOM   15   13   12   14
-		uvs[15] = new Vector2(uvsBottom.x, uvsBottom.y);
+		// BOTTOM   15   13   12   14 a
+		uvs[12] = new Vector2(uvsBottom.x, uvsBottom.y);
 		uvs[13] = new Vector2(uvsBottom.x + uvsBottom.width, uvsBottom.y);
-		uvs[12] = new Vector2(uvsBottom.x, uvsBottom.y - uvsBottom.height);
+		uvs[15] = new Vector2(uvsBottom.x, uvsBottom.y - uvsBottom.height);
 		uvs[14] = new Vector2(uvsBottom.x + uvsBottom.width, uvsBottom.y - uvsBottom.height);
 
 		// - Assign the mesh its new UVs -
