@@ -1,28 +1,25 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GBlock : MonoBehaviour {
 	public int id = 1;
-	private int old_id;
+	private int _oldId;
 	public Vector2 textureBlockSize;
 
 	private Mesh _blockMesh;
 
-	private Vector2[] uvs;
+	private Vector2[] _uvs;
 
 	private int _verticiesIndex;
 
 	private Texture _textureAtlas;
 	private Vector2 _atlasSize;
 
-	private const int SIZE = 10;
-
-	private Rect uvsFront = new Rect(0.0f, 1.0f, 0.125f, 0.125f);
-	private Rect uvsBack = new Rect(0.125f, 0.875f, 0.125f, 0.125f);
-	private Rect uvsLeft = new Rect(0.25f, 0.75f, 0.125f, 0.125f);
-	private Rect uvsRight = new Rect(0.375f, 0.625f, 0.125f, 0.125f);
-	private Rect uvsTop = new Rect(0.5f, 0.5f, 0.125f, 0.125f);
-	private Rect uvsBottom = new Rect(0.625f, 0.375f, 0.125f, 0.125f);
+	private Rect _uvsFront = new Rect(0.0f, 1.0f, 0.125f, 0.125f);
+	private Rect _uvsBack = new Rect(0.125f, 0.875f, 0.125f, 0.125f);
+	private Rect _uvsLeft = new Rect(0.25f, 0.75f, 0.125f, 0.125f);
+	private Rect _uvsRight = new Rect(0.375f, 0.625f, 0.125f, 0.125f);
+	private Rect _uvsTop = new Rect(0.5f, 0.5f, 0.125f, 0.125f);
+	private Rect _uvsBottom = new Rect(0.625f, 0.375f, 0.125f, 0.125f);
 
 	// Use this for initialization
 	void Start() {
@@ -30,73 +27,74 @@ public class GBlock : MonoBehaviour {
 
 		_textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
 		_atlasSize = new Vector2(_textureAtlas.width / textureBlockSize.x, _textureAtlas.height / textureBlockSize.y);
-		uvs = new Vector2[_blockMesh.uv.Length];
-		uvs = _blockMesh.uv;
-		
+		_uvs = new Vector2[_blockMesh.uv.Length];
+		_uvs = _blockMesh.uv;
+
 		SetUVs();
-		old_id = id;
+		_oldId = id;
 	}
 
 	void Update() {
-		if (id != old_id) {
+		if (id != _oldId) {
 			SetUVs();
-			old_id = id;
+			_oldId = id;
 		}
 	}
 
 	void SetUVs() {
 		Vector2 textureInterval = new Vector2(1 / _atlasSize.x, 1 / _atlasSize.y);
 
-		Vector2 textureId = new Vector2(textureInterval.x * (id % _atlasSize.x), textureInterval.y * Mathf.FloorToInt(id / _atlasSize.y));
-		
-		uvsFront = new Rect(textureId.x, textureId.y, textureInterval.x, textureInterval.y);
-		
+		Vector2 textureId = new Vector2(textureInterval.x * (id % _atlasSize.x),
+			textureInterval.y * Mathf.FloorToInt(id / _atlasSize.y));
+
+		_uvsFront = new Rect(textureId.x, textureId.y, textureInterval.x, textureInterval.y);
+
 		// Same textures on all sides for now
-		uvsBack = uvsFront;
-		uvsLeft = uvsFront;
-		uvsRight = uvsFront;
-		uvsTop = uvsFront;
-		uvsBottom = uvsFront;
-		
+		_uvsBack = _uvsFront;
+		_uvsLeft = _uvsFront;
+		_uvsRight = _uvsFront;
+		_uvsTop = _uvsFront;
+		_uvsBottom = _uvsFront;
+
 		// - set UV coordinates - All of the numbers in comments are the original/broken ones
 
 		// BACK    2    3    0    1
-		uvs[0] = new Vector2(uvsFront.x, uvsFront.y);
-		uvs[1] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y);
-		uvs[2] = new Vector2(uvsFront.x, uvsFront.y - uvsFront.height);
-		uvs[3] = new Vector2(uvsFront.x + uvsFront.width, uvsFront.y - uvsFront.height);
+		_uvs[0] = new Vector2(_uvsFront.x, _uvsFront.y);
+		_uvs[1] = new Vector2(_uvsFront.x + _uvsFront.width, _uvsFront.y);
+		_uvs[2] = new Vector2(_uvsFront.x, _uvsFront.y - _uvsFront.height);
+		_uvs[3] = new Vector2(_uvsFront.x + _uvsFront.width, _uvsFront.y - _uvsFront.height);
 
 		// FRONT    6    7   10   11
-		uvs[6] = new Vector2(uvsBack.x, uvsBack.y);
-		uvs[7] = new Vector2(uvsBack.x + uvsBack.width, uvsBack.y);
-		uvs[10] = new Vector2(uvsBack.x, uvsBack.y - uvsBack.height);
-		uvs[11] = new Vector2(uvsBack.x + uvsBack.width, uvsBack.y - uvsBack.height);
+		_uvs[6] = new Vector2(_uvsBack.x, _uvsBack.y);
+		_uvs[7] = new Vector2(_uvsBack.x + _uvsBack.width, _uvsBack.y);
+		_uvs[10] = new Vector2(_uvsBack.x, _uvsBack.y - _uvsBack.height);
+		_uvs[11] = new Vector2(_uvsBack.x + _uvsBack.width, _uvsBack.y - _uvsBack.height);
 
 		// LEFT   19   17   16   18
-		uvs[16] = new Vector2(uvsLeft.x, uvsLeft.y);
-		uvs[19] = new Vector2(uvsLeft.x + uvsLeft.width, uvsLeft.y);
-		uvs[17] = new Vector2(uvsLeft.x, uvsLeft.y - uvsLeft.height);
-		uvs[18] = new Vector2(uvsLeft.x + uvsLeft.width, uvsLeft.y - uvsLeft.height);
+		_uvs[16] = new Vector2(_uvsLeft.x, _uvsLeft.y);
+		_uvs[19] = new Vector2(_uvsLeft.x + _uvsLeft.width, _uvsLeft.y);
+		_uvs[17] = new Vector2(_uvsLeft.x, _uvsLeft.y - _uvsLeft.height);
+		_uvs[18] = new Vector2(_uvsLeft.x + _uvsLeft.width, _uvsLeft.y - _uvsLeft.height);
 
 		// RIGHT   23   21   20   22
-		uvs[20] = new Vector2(uvsRight.x, uvsRight.y);
-		uvs[23] = new Vector2(uvsRight.x + uvsRight.width, uvsRight.y);
-		uvs[21] = new Vector2(uvsRight.x, uvsRight.y - uvsRight.height);
-		uvs[22] = new Vector2(uvsRight.x + uvsRight.width, uvsRight.y - uvsRight.height);
+		_uvs[20] = new Vector2(_uvsRight.x, _uvsRight.y);
+		_uvs[23] = new Vector2(_uvsRight.x + _uvsRight.width, _uvsRight.y);
+		_uvs[21] = new Vector2(_uvsRight.x, _uvsRight.y - _uvsRight.height);
+		_uvs[22] = new Vector2(_uvsRight.x + _uvsRight.width, _uvsRight.y - _uvsRight.height);
 
 		// TOP    4    5    8    9
-		uvs[4] = new Vector2(uvsTop.x, uvsTop.y);
-		uvs[5] = new Vector2(uvsTop.x + uvsTop.width, uvsTop.y);
-		uvs[8] = new Vector2(uvsTop.x, uvsTop.y - uvsTop.height);
-		uvs[9] = new Vector2(uvsTop.x + uvsTop.width, uvsTop.y - uvsTop.height);
+		_uvs[4] = new Vector2(_uvsTop.x, _uvsTop.y);
+		_uvs[5] = new Vector2(_uvsTop.x + _uvsTop.width, _uvsTop.y);
+		_uvs[8] = new Vector2(_uvsTop.x, _uvsTop.y - _uvsTop.height);
+		_uvs[9] = new Vector2(_uvsTop.x + _uvsTop.width, _uvsTop.y - _uvsTop.height);
 
 		// BOTTOM   15   13   12   14 a
-		uvs[12] = new Vector2(uvsBottom.x, uvsBottom.y);
-		uvs[13] = new Vector2(uvsBottom.x + uvsBottom.width, uvsBottom.y);
-		uvs[15] = new Vector2(uvsBottom.x, uvsBottom.y - uvsBottom.height);
-		uvs[14] = new Vector2(uvsBottom.x + uvsBottom.width, uvsBottom.y - uvsBottom.height);
+		_uvs[12] = new Vector2(_uvsBottom.x, _uvsBottom.y);
+		_uvs[13] = new Vector2(_uvsBottom.x + _uvsBottom.width, _uvsBottom.y);
+		_uvs[15] = new Vector2(_uvsBottom.x, _uvsBottom.y - _uvsBottom.height);
+		_uvs[14] = new Vector2(_uvsBottom.x + _uvsBottom.width, _uvsBottom.y - _uvsBottom.height);
 
 		// - Assign the mesh its new UVs -
-		_blockMesh.uv = uvs;
+		_blockMesh.uv = _uvs;
 	}
 }
