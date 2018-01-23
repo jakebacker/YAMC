@@ -5,6 +5,7 @@ public class GBlock : MonoBehaviour {
 	private int _oldId;
 	public Vector2 textureBlockSize;
 
+	private Renderer _renderer;
 	private Mesh _blockMesh;
 
 	private Vector2[] _uvs;
@@ -23,6 +24,7 @@ public class GBlock : MonoBehaviour {
 
 	// Use this for initialization
 	void Start() {
+		_renderer = GetComponent<Renderer>();
 		_blockMesh = GetComponent<MeshFilter>().mesh;
 
 		_textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
@@ -35,7 +37,14 @@ public class GBlock : MonoBehaviour {
 	}
 
 	void Update() {
-		if (id != _oldId) {
+
+		if (id < 0 && _renderer.enabled) {
+			_renderer.enabled = false;
+		} else if (id != _oldId) {
+			if (!_renderer.enabled) {
+				_renderer.enabled = true;
+			}
+
 			SetUVs();
 			_oldId = id;
 		}
