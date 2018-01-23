@@ -425,4 +425,8 @@ public class PlayerController : MonoBehaviour
 
 		return face;
 	}
+
+	public int GetHotbarSelection() {
+		return _currentSelection;
+	}
 }
