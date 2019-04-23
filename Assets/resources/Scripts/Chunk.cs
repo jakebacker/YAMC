@@ -108,7 +108,7 @@ public class Chunk : MonoBehaviour
 						
 						float noise = Noise.Perlin3D(seed + xNoise, seed + yNoise, seed + zNoise);
 						
-						if (noise < 0.7)
+						if (noise < 0.67)
 						{
 							chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(2)); // Stone
 						}
@@ -124,8 +124,8 @@ public class Chunk : MonoBehaviour
 							
 							float oreNoise = Noise.Perlin3D(seed + oreXNoise, seed + oreYNoise, seed + oreZNoise);
 
-							if (oreNoise < 0.3) {
-								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(5));
+							if (oreNoise < 0.34) {
+								chunkBlocks[x, y, z] = new Block(Game.register.GetBlock(5)); // Coal
 							}
 						}
 
