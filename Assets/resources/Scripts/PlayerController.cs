@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
 	// ReSharper disable once RedundantDefaultMemberInitializer
 	private bool _isHotbarInit = false;
 
+	private const int RenderDistance = 9; // Chunks
+	
 	// Use this for initialization
 	private void Start()
 	{
@@ -35,6 +37,8 @@ public class PlayerController : MonoBehaviour
 
 		_cameraObject = transform.Find("Camera").gameObject;
 		_cam = _cameraObject.GetComponent<Camera>();
+
+		_cam.farClipPlane = 16 * RenderDistance;
 
 		Cursor.lockState = CursorLockMode.Confined;
 		Cursor.visible = false;
