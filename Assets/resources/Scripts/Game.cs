@@ -85,6 +85,13 @@ public class Game : MonoBehaviour {
 			hasTransparency = true
 		};
 		register.AddBlock(glassBlock, 6);
+		
+		Block leavesBlock = new Block(false)
+		{
+			id = 7,
+			hasTransparency = true
+		};
+		register.AddBlock(leavesBlock, 7);
 	}
 	
 	private void RegisterItems()
@@ -144,6 +151,14 @@ public class Game : MonoBehaviour {
 			id = 6
 		};
 		register.AddItem(glassBlock);
+
+		Item leavesBlock = new Item
+		{
+			type = ItemType.Block,
+			block = register.GetBlock(7),
+			id = 7
+		};
+		register.AddItem(leavesBlock);
 	}
 	
 	// Run after RegisterBlocks and RegisterItems

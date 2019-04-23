@@ -8,12 +8,13 @@ public class HotbarSelector : MonoBehaviour {
 
 	private int previousSelection = 0;
 	
-	private Vector3 currentPosition = new Vector3(-258, -348.5f, 0); // Initally set to the starting position
-	private float xPositionIncrement = 64.5f;
+	private Vector3 currentPosition = new Vector3(-260, -30, 0); // Initally set to the starting position
+	private float xPositionIncrement = 65;
 	
 	// Use this for initialization
 	void Start () {
-		transform.localPosition = currentPosition;
+		//transform.localPosition = currentPosition;
+		currentPosition = transform.localPosition;
 	}
 	
 	// Update is called once per frame

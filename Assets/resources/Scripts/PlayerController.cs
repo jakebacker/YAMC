@@ -57,6 +57,7 @@ public class PlayerController : MonoBehaviour
 			_hotbar[6] = Game.register.GetItem(6);
 			_hotbar[7] = Game.register.GetItem(7);
 			_hotbar[8] = Game.register.GetItem(8);
+			_hotbar[9] = Game.register.GetItem(9);
 			_isHotbarInit = true;
 		}
 
@@ -104,7 +105,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Select block
-		if (Input.mouseScrollDelta.y > 0) // Right
+		if (Input.mouseScrollDelta.y < 0) // Left
 		{
 			if (_currentSelection == 9)
 			{
@@ -115,7 +116,7 @@ public class PlayerController : MonoBehaviour
 				_currentSelection++;
 			}
 		}
-		else if (Input.mouseScrollDelta.y < 0)
+		else if (Input.mouseScrollDelta.y > 0)
 		{
 			if (_currentSelection == 1)
 			{

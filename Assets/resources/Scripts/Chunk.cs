@@ -311,7 +311,7 @@ public class Chunk : MonoBehaviour
 		_chunkTriangles.Add(_verticiesIndex + 3);
 		_chunkTriangles.Add(_verticiesIndex);
 
-		Vector2 textureInterval = new Vector2(1 / _atlasSize.x, 1 / _atlasSize.y);
+		Vector2 textureInterval = new Vector2(1.0f / _atlasSize.x, 1.0f / _atlasSize.y);
 
 		Vector2 textureId = new Vector2(textureInterval.x * (blockId % _atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockId / _atlasSize.y));
 
