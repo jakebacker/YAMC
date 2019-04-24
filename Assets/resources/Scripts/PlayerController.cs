@@ -101,7 +101,6 @@ public class PlayerController : MonoBehaviour
 		}
 		else if (Input.GetMouseButtonDown(1))
 		{
-			Debug.Log(_currentSelection);
 			if (_hotbar[_currentSelection - 1].type == ItemType.Block)
 			{
 				PlaceBlock(_hotbar[_currentSelection - 1].block);

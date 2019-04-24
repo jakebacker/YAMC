@@ -44,6 +44,8 @@ public class World : MonoBehaviour
 
                 GameObject newChunk = Instantiate(ChunkPrefab);
                 newChunk.transform.localPosition = chunkPosition;
+                Chunk newChunkScript = newChunk.GetComponent<Chunk>();
+                newChunkScript.SetupChunk();
             }
         } 
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 using Random = UnityEngine.Random;
 
 [Serializable]
@@ -37,14 +38,30 @@ public class Chunk : MonoBehaviour
 	private Vector2 _atlasSize;
 
 	private bool _hasGenerated;
+	private bool _hasSetup;
 
 	private void Start ()
 	{
 
+		
+	}
+
+	private void Update() {
+		if (Game.hasStarted && !_hasGenerated && _hasSetup)
+		{
+			GenerateChunk();
+			_chunkCollider = GetComponent<MeshCollider>();
+
+			_bounds.SetMinMax(transform.position, transform.position + chunkSize);
+		}
+	}
+
+	public void SetupChunk()
+	{
 		_chunkPosition = new RVector3(transform.position);
 		_textureAtlas = transform.GetComponent<MeshRenderer>().material.mainTexture;
 		_atlasSize = new Vector2(_textureAtlas.width / textureBlockSize.x, _textureAtlas.height / textureBlockSize.y);
-
+		
 		_chunkMesh = GetComponent<MeshFilter>().mesh;
 		_chunkMesh.MarkDynamic();
 
@@ -60,20 +77,11 @@ public class Chunk : MonoBehaviour
 
 			_bounds.SetMinMax(transform.position, transform.position + chunkSize);
 		}
-	}
 
-	private void Update() {
-		if (Game.hasStarted && !_hasGenerated)
-		{
-			GenerateChunk();
-			_chunkCollider = GetComponent<MeshCollider>();
-
-			_bounds.SetMinMax(transform.position, transform.position + chunkSize);
-		}
+		_hasSetup = true;
 	}
 
 	public void GenerateChunk() {
-
 		float[,] chunkHeights = Noise.Generate(new RVector3(transform.position), chunkSize.x + 1, chunkSize.y + 1, seed, intensity);
 
 		chunkBlocks = new Block[chunkSize.x + 1, chunkSize.y + 1, chunkSize.z + 1];
@@ -315,7 +323,6 @@ public class Chunk : MonoBehaviour
 
 		Vector2 textureId = new Vector2(textureInterval.x * (blockId % _atlasSize.x), textureInterval.y * Mathf.FloorToInt(blockId / _atlasSize.y));
 
-		
 		_chunkUv.Add(new Vector2(textureId.x,textureId.y-textureInterval.y));
 		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y-textureInterval.y));
 		_chunkUv.Add(new Vector2(textureId.x+textureInterval.x,textureId.y));

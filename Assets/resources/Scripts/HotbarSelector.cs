@@ -23,7 +23,6 @@ public class HotbarSelector : MonoBehaviour {
 
 		if (hotbarPosition != previousSelection) {
 			float deltaX = xPositionIncrement * (hotbarPosition - previousSelection);
-			Debug.Log(deltaX);
 
 			currentPosition.x = currentPosition.x + deltaX;
 
